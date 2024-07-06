@@ -10,7 +10,10 @@ variable "vpc_cidr_block" {
     default = "10.0.0.0/16"
 }
 
-
+variable "aws_account_id" {
+  type    = string
+  default = "975050270418"
+}
 
 ############## subnets ###############
 # for WP work's VMs
@@ -71,4 +74,9 @@ variable "db_subnet_id" {
 variable "db_rds_avail_zone" {
   type    = list(string)
   default = [ "eu-west-1a" ]
+}
+
+variable "secret_manager_secret_name" {
+  type    = string
+  default = "test_mysql_pass"
 }

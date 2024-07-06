@@ -162,7 +162,7 @@ resource "aws_db_instance" "default" {
 
 
 data "aws_secretsmanager_secret" "example" {
-  name = "test_mysql_pass"
+  name = var.secret_manager_secret_name
 }
 
 data "aws_secretsmanager_secret_version" "example" {
@@ -224,3 +224,26 @@ resource "aws_security_group" "packer_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+############## Policy to add access from admin subnet to secrets ##############
+# resource "aws_iam_policy" "allow_secrets_access" {
+#   name        = "AllowSecretsAccess"
+#   description = "Policy to allow access to secrets for resources in specified subnet"
+#   policy      = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": "secretsmanager:GetSecretValue",
+#       "Resource": "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account_id}:secret:${var.secret_manager_secret_name}",
+#       "Condition": {
+#         "StringEquals": {
+#           "aws:ResourceTag/admin_subnet": "true"
+#         }
+#       }
+#     }
+#   ]
+# }
+# EOF
+# }

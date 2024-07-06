@@ -104,5 +104,11 @@ provisioner "shell" {
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
   ]
 
+  environment_vars = [
+      "aws_region=${var.aws_region}",
+      "aws_access_key=${var.aws_access_key}",
+      "aws_secret_key=${var.aws_secret_key}"
+  ]
+
 }
 }
