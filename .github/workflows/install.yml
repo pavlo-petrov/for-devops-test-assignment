@@ -90,7 +90,6 @@ jobs:
               -var "docker_hub_access_token=${{ env.DOCKER_HUB_ACCESS_TOKEN }}" \
               -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
               -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-              -var "subnet_id=${{ env.subnet_id }}" \
               -var "rds_endpoint=${{ env.rds_endpoint }}" \
               -var "redis_endpoint=${{ env.redis_endpoint }}" \
               -var "redis_port=${{ env.redis_port }}" \
