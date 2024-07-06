@@ -206,6 +206,7 @@ resource "aws_elasticache_cluster" "redis_cluster" {
 resource "aws_security_group" "packer_security_group" {
   name        = "packer_security_group"
   description = "Security group for packer deployment"
+  vpc_id      = aws_vpc.main.id 
 
   // Визначте вихідні правила для трафіку
   egress {
