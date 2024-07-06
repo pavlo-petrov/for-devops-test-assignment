@@ -95,7 +95,7 @@ provisioner "shell" {
     "newgrp docker",
     "sudo systemctl start docker",
     "sudo systemctl enable docker",
-    "sudo apt install awscli",
+    "sudo apt install -y awscli",
     "sudo DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')",
     "sudo DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')",
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
