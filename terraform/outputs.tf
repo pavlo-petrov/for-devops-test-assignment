@@ -25,6 +25,10 @@ output "admin_subnet_ids" {
   value = aws_subnet.admin_subnet[*].id
 }
 
+output "admin_subnet_ids_for_packer" {
+  value = aws_subnet.admin_subnet[0].id
+}
+
 output "admin_subnet_cidrs" {
   value = aws_subnet.admin_subnet[*].cidr_block
 }
