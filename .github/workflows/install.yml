@@ -53,14 +53,15 @@ jobs:
           aws-region: ${{ env.cloud_region }}
 
       - name: Initialize Terraform
-        run: terraform init ${{ env.terraform_file }}
-
-      - name: Initialize get outputs
-        run: terraform output ${{ env.terraform_file }}
-
+        run: cd ${{ env.terraform_file }} && terraform init
+  
+      - name: Apply Terraform
+        run: cd ${{ env.terraform_file }} && terraform output
+  
       - name: Get Terraform Outputs
         id: terraform_outputs
         run: |
+          cd ${{ env.terraform_file }}
           echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
           echo "vpc_id=$(terraform output -raw vpc_id)"
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
