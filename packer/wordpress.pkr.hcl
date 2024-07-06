@@ -96,8 +96,9 @@ provisioner "shell" {
     "sudo systemctl start docker",
     "sudo systemctl enable docker",
     "sudo apt install -y awscli",
-    "sudo DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')",
-    "sudo DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')",
+    "aws configure set region ${var.aws_region}",
+    "DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')",
+    "DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')",
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
     "sudo docker pull footballaws2/wordpress:latest",
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
