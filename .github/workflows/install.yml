@@ -29,5 +29,5 @@ jobs:
           
       - name: Build and push Docker image
         run: |
-          docker build -t footballaws1/frontend:latest -f ${{ env.docker-file }} .
+          docker build -t footballaws2/frontend:latest -f ${{ env.docker-file }} .
           docker push footballaws2/wordpress:latest
