@@ -8,7 +8,7 @@ on:
 
 env: 
   cloud_region: eu-west-1
-  packer-file: ./packer/workdir.pkr.hcl
+  packer-file: ./packer/wordpress.pkr.hcl
   ami-prefics: wordpress-prod-
   docker-file: ./docker/Dockerfile
   terraform-file: ./terraform
@@ -62,10 +62,11 @@ jobs:
         id: terraform_outputs
         run: |
           echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "admin_subnet_ids=$(terraform output -json admin_subnet_ids | jq -r '.[0]')" >> $GITHUB_ENV
+          echo "vpc_id=$(terraform output -raw vpc_id)"
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
           echo "redis_endpoint=$(terraform output -raw redis_endpoint)" >> $GITHUB_ENV
           echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
+          echo "admin_subnet_ids=$(terraform output -json admin_subnet_ids | jq -r '.[0]')" >> $GITHUB_ENV
         
       - name: Retrieve Docker Hub credentials from AWS Secrets Manager
         run: |
