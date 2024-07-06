@@ -192,14 +192,14 @@ resource "aws_elasticache_cluster" "redis_cluster" {
 
 ######################## ELB ##############
 
-resource "aws_elb" "example_elb" {
-  name               = "example-elb"
-  availability_zones = var.azs
-  listener {
-    lb_port           = 80
-    lb_protocol       = "http"
-    instance_port     = 80
-    instance_protocol = "http"
-  }
- subnets              = ["subnet-0c3d66cdcc7b8b9db", "subnet-0f2a42aba3e897ff7", "subnet-0cce7261a1367067b"]
-}
+# resource "aws_elb" "example_elb" {
+#   name               = "example-elb"
+#   availability_zones = var.azs
+#   listener {
+#     lb_port           = 80
+#     lb_protocol       = "http"
+#     instance_port     = 80
+#     instance_protocol = "http"
+#   }
+#  subnets              = ["subnet-0c3d66cdcc7b8b9db", "subnet-0f2a42aba3e897ff7", "subnet-0cce7261a1367067b"]
+# }

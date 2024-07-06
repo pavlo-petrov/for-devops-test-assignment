@@ -54,3 +54,11 @@ output "internet_gateway_id" {
 output "rds_endpoint" {
   value = split(":", aws_db_instance.default.endpoint)[0]
 }
+
+output "redis_endpoint" {
+  value = aws_elasticache_cluster.redis_cluster.cache_nodes[0].address
+}
+
+output "redis_port" {
+  value = aws_elasticache_cluster.redis_cluster.port
+}

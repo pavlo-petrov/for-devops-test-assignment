@@ -8,9 +8,10 @@ on:
 
 env: 
   cloud_region: eu-west-1
-  packer-file: ./infra/packer/frontend/frontend.pkr.hcl
+  packer-file: ./packer/workdir.pkr.hcl
   ami-prefics: wordpress-prod-
   docker-file: ./docker/Dockerfile
+  terraform-file: ./terrsform
 
 jobs:
 ################################# docker front part ##################################
@@ -31,3 +32,61 @@ jobs:
         run: |
           docker build -t footballaws2/wordpress -f ${{ env.docker-file }} .
           docker push footballaws2/wordpress
+
+
+################################# packer ##################################
+  packer_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v3.1.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.cloud_region }}
+
+      - name: Initialize Terraform
+        run: terraform init ${{ env.terraform_file }}
+
+      - name: Initialize get outputs
+        run: terraform output ${{ env.terraform_file }}
+
+      - name: Get Terraform Outputs
+        id: terraform_outputs
+        run: |
+          echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+          echo "admin_subnet_ids=$(terraform output -json admin_subnet_ids | jq -r '.[0]')" >> $GITHUB_ENV
+          echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
+          echo "redis_endpoint=$(terraform output -raw redis_endpoint)" >> $GITHUB_ENV
+          echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
+        
+      - name: Retrieve Docker Hub credentials from AWS Secrets Manager
+        run: |
+            echo "Retrieving secrets from AWS Secrets Manager..."
+            DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')
+            DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')
+            echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" >> $GITHUB_ENV
+            echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
+
+      - name: Run Packer
+        run: |
+          packer init ${{ env.packer_file }}
+          packer build -var "vpc_id=${{ env.vpc_id }}" \
+              -var "docker_hub_username=${{ env.DOCKER_HUB_USERNAME }}" \
+              -var "docker_hub_access_token=${{ env.DOCKER_HUB_ACCESS_TOKEN }}" \
+              -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+              -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+              -var "subnet_id=${{ env.subnet_id }}" \
+              -var "rds_endpoint=${{ env.rds_endpoint }}" \
+              -var "redis_endpoint=${{ env.redis_endpoint }}" \
+              -var "redis_port=${{ env.redis_port }}" \
+              -var "timestamp=$timeline" \
+              -var "aws_region=${{ env.cloud_region }}" \
+              ${{ env.packer_file }}
