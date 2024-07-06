@@ -42,7 +42,7 @@ packer {
   }
 }
 
-source "amazon-ebs" "frontend" {
+source "amazon-ebs" "wordpress" {
   ami_name      = "${var.ami_name}-${var.timestamp}"
   instance_type = "t2.micro"
   region        = var.aws_region
@@ -63,7 +63,7 @@ source "amazon-ebs" "frontend" {
 
 
 build {
-  sources = ["source.amazon-ebs.frontend"]
+  sources = ["source.amazon-ebs.wordpress"]
 
 provisioner "shell" {
   inline = [

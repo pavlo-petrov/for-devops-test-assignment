@@ -7,10 +7,8 @@ terraform {
     bucket         = "mybucketfortest-2024-07-04-test"
     key            = "wordpress/prod/terraform.tfstate"
     region         = "eu-west-1"
-  #  dynamodb_table = "terraform-lock-table" #### іншим разом..... 
   }
 }
-
 
 resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidr_block
