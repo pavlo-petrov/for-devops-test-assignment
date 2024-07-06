@@ -33,6 +33,15 @@ variable "ami_name" {
   default = "wordpress-prod"
 }
 
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.3.2"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
 source "amazon-ebs" "frontend" {
   ami_name      = "${var.ami_name}-${var.timestamp}"
   instance_type = "t2.micro"
