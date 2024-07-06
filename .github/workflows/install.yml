@@ -84,6 +84,7 @@ jobs:
 
       - name: Run Packer
         run: |
+          timeline="$(date +'%Y%m%d%H%M%S')"
           packer init ${{ env.packer-file }}
           packer build -var "vpc_id=${{ env.vpc_id }}" \
               -var "docker_hub_username=${{ env.DOCKER_HUB_USERNAME }}" \
