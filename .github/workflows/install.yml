@@ -48,7 +48,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.cloud_region }}
 
@@ -81,7 +81,7 @@ jobs:
           packer build -var "vpc_id=${{ env.vpc_id }}" \
               -var "docker_hub_username=${{ env.DOCKER_HUB_USERNAME }}" \
               -var "docker_hub_access_token=${{ env.DOCKER_HUB_ACCESS_TOKEN }}" \
-              -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+              -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
               -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               -var "subnet_id=${{ env.subnet_id }}" \
               -var "rds_endpoint=${{ env.rds_endpoint }}" \
