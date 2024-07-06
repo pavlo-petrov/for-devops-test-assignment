@@ -1,6 +1,15 @@
-variable "aws_region" {}
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
+variable "aws_region" {
+  type = string
+}
+
+variable "aws_access_key" {
+  type = string
+}
+
+variable "aws_secret_key" {
+  type = string
+}
+
 variable "vpc_id" {
   type = string
 }
@@ -27,12 +36,12 @@ variable "timestamp" {
 }
 
 variable "ami_name" {
-  type    = string
+  type = string
   default = ""
 }
 
 variable "security_group_for_parcker" {
-    type  = string
+  type = string
 }
 
 packer {
@@ -92,10 +101,6 @@ provisioner "shell" {
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
     "sudo docker pull footballaws2/wordpress:latest",
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
-  ]
-  environment_vars = [
-      "DOCKER_HUB_USERNAME=${var.docker_hub_username}",
-      "DOCKER_HUB_ACCESS_TOKEN=${var.docker_hub_access_token}"
   ]
 
 }
