@@ -35,6 +35,7 @@ variable "ami_name" {
 
 security_group_for_parcker {
     type  = string
+    default = ""
 }
 
 packer {
