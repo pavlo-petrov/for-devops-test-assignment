@@ -7,7 +7,7 @@ variable "vpc_id" {
   type = string
 }
 
-variable "subnet_id" {
+variable "admin_subnet_ids" {
   type = string
 }
 
@@ -46,6 +46,8 @@ source "amazon-ebs" "frontend" {
   ami_name      = "${var.ami_name}-${var.timestamp}"
   instance_type = "t2.micro"
   region        = var.aws_region
+  vpc_id        = var.vpc_id
+  subnet_id     = var.admin_subnet_ids
   source_ami_filter {
     filters = {
       architecture        = "x86_64"
