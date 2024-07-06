@@ -10,7 +10,7 @@ env:
   cloud_region: eu-west-1
   packer-file: ./infra/packer/frontend/frontend.pkr.hcl
   ami-prefics: wordpress-prod-
-  docker-file: /docker/Dockerfile
+  docker-file: ./docker/Dockerfile
 
 jobs:
 ################################# docker front part ##################################
@@ -29,5 +29,5 @@ jobs:
           
       - name: Build and push Docker image
         run: |
-          docker build -t footballaws2/frontend -f ${{ env.docker-file }} .
+          docker build -t footballaws2/wordpress -f ${{ env.docker-file }} .
           docker push footballaws2/wordpress
