@@ -73,7 +73,7 @@ jobs:
           echo "redis_endpoint=$(terraform output -raw redis_endpoint)" >> $GITHUB_ENV
           echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
           echo "admin_subnet_ids=$(terraform output -raw admin_subnet_ids_for_packer)" >> $GITHUB_ENV
-          echo "security_group_for_parcker=$(terraform output -raw security_group_id)" >> $GITHUB_ENV
+          echo "security_group_for_parcker=$(terraform output -raw secutity_group_packer_id)" >> $GITHUB_ENV
         
       - name: Retrieve Docker Hub credentials from AWS Secrets Manager
         run: |
