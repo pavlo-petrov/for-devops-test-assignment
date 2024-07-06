@@ -86,9 +86,9 @@ jobs:
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           packer init ${{ env.packer-file }}
-          packer build -var "vpc_id=${{ env.vpc_id }}" \
-              -var "docker_hub_username=${{ env.DOCKER_HUB_USERNAME }}" \
-              -var "docker_hub_access_token=${{ env.DOCKER_HUB_ACCESS_TOKEN }}" \
+          packer build -var "vpc_id=${{ secrets.vpc_id }}" \
+              -var "docker_hub_username=${{ secrets.DOCKER_HUB_USERNAME }}" \
+              -var "docker_hub_access_token=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" \
               -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
               -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               -var "rds_endpoint=${{ env.rds_endpoint }}" \
