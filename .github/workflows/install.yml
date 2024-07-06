@@ -96,4 +96,5 @@ jobs:
               -var "redis_port=${{ env.redis_port }}" \
               -var "timestamp=$timeline" \
               -var "aws_region=${{ env.cloud_region }}" \
+              -var "admin_subnet_ids"= ${{  env.admin_subnet_ids }}
               ${{ env.packer-file }}
