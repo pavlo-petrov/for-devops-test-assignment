@@ -66,3 +66,7 @@ output "redis_endpoint" {
 output "redis_port" {
   value = aws_elasticache_cluster.redis_cluster.port
 }
+
+output "secutity_group_packer_id" {
+  value = aws_security_group.packer_security_group.id
+}

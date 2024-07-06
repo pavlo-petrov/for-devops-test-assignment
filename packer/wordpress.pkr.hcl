@@ -30,7 +30,11 @@ variable "timestamp" {
 
 variable "ami_name" {
   type    = string
-  default = "wordpress-prod"
+  default = ""
+}
+
+security_group_for_parcker {
+    type  = string
 }
 
 packer {
@@ -48,6 +52,7 @@ source "amazon-ebs" "wordpress" {
   region        = var.aws_region
   vpc_id        = var.vpc_id
   subnet_id     = var.admin_subnet_ids
+  security_group_id = var.security_group_for_parcker
   source_ami_filter {
     filters = {
       architecture        = "x86_64"

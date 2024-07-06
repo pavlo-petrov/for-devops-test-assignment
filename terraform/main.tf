@@ -201,3 +201,24 @@ resource "aws_elasticache_cluster" "redis_cluster" {
 #   }
 #  subnets              = ["subnet-0c3d66cdcc7b8b9db", "subnet-0f2a42aba3e897ff7", "subnet-0cce7261a1367067b"]
 # }
+
+##################### security group for parcker #################
+resource "aws_security_group" "packer_security_group" {
+  name        = "packer_security_group"
+  description = "Security group for packer deployment"
+
+  // Визначте вихідні правила для трафіку
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+   ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
