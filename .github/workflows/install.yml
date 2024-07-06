@@ -21,34 +21,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
-      - name: Configure AWS credentials
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set region ${{ env.cloud_region }}
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform init
-      
-      - name: Terraform Outputs 
-        run: terraform output
-
-      - name: Extract RDS endpoint
-        id: rds-endpoint
-        run: echo "::set-output name=rds_endpoint::$(terraform output -raw rds_endpoint)"
-        
-
-      - name: Fetch MySQL secrets from AWS Secrets Manager
-        id: secrets
-        run: |
-          export RDS_ENDPOINT=${{ steps.rds-endpoint.outputs.rds_endpoint }}
-          MYSQL_PASSWORD_KEY=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.MYSQL_PASSWORD_KEY')
-          echo "MYSQL_PASSWORD_KEY=$MYSQL_PASSWORD_KEY" >> $GITHUB_ENV
-          echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -57,5 +29,5 @@ jobs:
           
       - name: Build and push Docker image
         run: |
-          docker build --build-arg MYSQL_PASSWORD_KEY=$MYSQL_PASSWORD_KEY --build-arg RDS_ENDPOINT=$RDS_ENDPOINT -t footballaws1/frontend:0.1 -f ${{ env.docker-file }} .
-          docker push footballaws1/frontend:0.1
+          docker build -t footballaws1/frontend:latest -f ${{ env.docker-file }} .
+          docker push footballaws2/wordpress:latest

@@ -201,4 +201,5 @@ resource "aws_elb" "example_elb" {
     instance_port     = 80
     instance_protocol = "http"
   }
+ subnets              = ["subnet-0c3d66cdcc7b8b9db", "subnet-0f2a42aba3e897ff7", "subnet-0cce7261a1367067b"]
 }
