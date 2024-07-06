@@ -61,6 +61,7 @@ jobs:
       - name: Get Terraform Outputs
         id: terraform_outputs
         run: |
+          echo "vpc_id=$(terraform output -raw vpc_id)"
           echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
           echo "admin_subnet_ids=$(terraform output -json admin_subnet_ids | jq -r '.[0]')" >> $GITHUB_ENV
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
