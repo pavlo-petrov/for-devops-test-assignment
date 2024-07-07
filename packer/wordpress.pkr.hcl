@@ -106,7 +106,8 @@ provisioner "shell" {
     "sudo systemctl enable docker",
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
     "sudo docker pull footballaws2/wordpress:latest",
-    "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
+    "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest",
+    "sudo rm /root/.docker/config.json"
   ]
 
   environment_vars = [
