@@ -226,24 +226,41 @@ resource "aws_security_group" "packer_security_group" {
 }
 
 ############## Policy to add access from admin subnet to secrets ##############
-# resource "aws_iam_policy" "allow_secrets_access" {
-#   name        = "AllowSecretsAccess"
-#   description = "Policy to allow access to secrets for resources in specified subnet"
-#   policy      = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": "secretsmanager:GetSecretValue",
-#       "Resource": "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account_id}:secret:${var.secret_manager_secret_name}",
-#       "Condition": {
-#         "StringEquals": {
-#           "aws:ResourceTag/admin_subnet": "true"
-#         }
-#       }
+# data "aws_iam_policy_document" "secret_manager_policy" {
+#   statement {
+#     actions   = ["secretsmanager:GetSecretValue"]
+#     resources = ["arn:aws:secretsmanager:${var.aws_region}:${var.aws_account_id}:secret:${var.secret_manager_secret_name}"]
+    
+#     # Умова, що дозволяє доступ тільки з вказаних підмереж
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceVpc"
+#       values   = [for subnet in aws_subnet.admin_subnet : subnet.id]
 #     }
-#   ]
+#   }
 # }
-# EOF
+
+# resource "aws_iam_policy" "secret_manager_policy" {
+#   name        = "EC2SecretManagerAccessPolicy"
+#   description = "Allows access to AWS Secrets Manager from specified subnets"
+#   policy      = data.aws_iam_policy_document.secret_manager_policy.json
+# }
+
+# resource "aws_iam_role" "ec2_role" {
+#   name               = "EC2SecretManagerAccessRole"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect    = "Allow"
+#       Principal = {
+#         Service = "ec2.amazonaws.com"
+#       }
+#       Action    = "sts:AssumeRole"
+#     }]
+#   })
+# }
+
+# resource "aws_iam_role_policy_attachment" "secret_manager_policy_attachment" {
+#   role       = aws_iam_role.ec2_role.name
+#   policy_arn = aws_iam_policy.secret_manager_policy.arn
 # }

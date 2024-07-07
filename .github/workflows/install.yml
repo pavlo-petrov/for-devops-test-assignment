@@ -79,7 +79,7 @@ jobs:
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           packer init ${{ env.packer-file }}
-          packer build -var "vpc_id=${{ secrets.vpc_id }}" \
+          ::add-mask:: packer build -var "vpc_id=${{ secrets.vpc_id }}" \
               -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
               -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               -var "rds_endpoint=${{ env.rds_endpoint }}" \
