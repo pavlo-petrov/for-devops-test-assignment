@@ -113,4 +113,4 @@ jobs:
               -var "security_group_for_parcker"=${{ env.security_group_for_parcker }} \
               -var "DOCKER_HUB_ACCESS_TOKEN"=${{ env.DOCKER_HUB_ACCESS_TOKEN }} \
               -var "DOCKER_HUB_USERNAME"=${{ env.DOCKER_HUB_USERNAME }} \
-              ${{ env.packer-file }}
+              ${{ env.packer-file }} | grep -v "Reading state information"
