@@ -44,6 +44,15 @@ variable "security_group_for_parcker" {
   type = string
 }
 
+variable "DOCKER_HUB_ACCESS_TOKEN" {
+  type = string
+}
+variable "DOCKER_HUB_USERNAME" {
+  type = string
+}
+
+
+
 packer {
   required_plugins {
     amazon = {

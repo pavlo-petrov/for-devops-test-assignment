@@ -74,6 +74,14 @@ jobs:
           echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
           echo "admin_subnet_ids=$(terraform output -raw admin_subnet_ids_for_packer)" >> $GITHUB_ENV
           echo "security_group_for_parcker=$(terraform output -raw secutity_group_packer_id)" >> $GITHUB_ENV
+      
+      - name: Retrieve Docker Hub credentials from AWS Secrets Manager
+        run: |
+          echo "Retrieving secrets from AWS Secrets Manager..."
+          DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')
+          DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')
+          echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" >> $GITHUB_ENV
+          echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
             
       - name: Set up environment
         run: |
@@ -86,7 +94,9 @@ jobs:
           echo "::add-mask::${{ env.cloud_region }}"
           echo "::add-mask::${{ env.admin_subnet_ids }}"
           echo "::add-mask::${{ env.security_group_for_parcker }}"
-
+          echo "::add-mask::${{ env.DOCKER_HUB_ACCESS_TOKEN }}"
+          echo "::add-mask::${{ env.DOCKER_HUB_USERNAME }}"
+          
       - name: Run Packer
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
@@ -101,4 +111,6 @@ jobs:
               -var "aws_region=${{ env.cloud_region }}" \
               -var "admin_subnet_ids"=${{  env.admin_subnet_ids }} \
               -var "security_group_for_parcker"=${{ env.security_group_for_parcker }} \
+              -var "DOCKER_HUB_ACCESS_TOKEN"=${{ env.DOCKER_HUB_ACCESS_TOKEN }} \
+              -var "DOCKER_HUB_USERNAME"=${{ env.DOCKER_HUB_USERNAME }} \
               ${{ env.packer-file }}
