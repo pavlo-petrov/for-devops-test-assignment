@@ -110,8 +110,8 @@ provisioner "shell" {
   ]
 
   environment_vars = [
-      "DOCKER_HUB_USERNAME=${var.docker_hub_username}",
-      "DOCKER_HUB_ACCESS_TOKEN=${var.docker_hub_access_token}"
+      "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
+      "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}"
   ]
 
 }
