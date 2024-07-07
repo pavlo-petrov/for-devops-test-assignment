@@ -74,12 +74,24 @@ jobs:
           echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
           echo "admin_subnet_ids=$(terraform output -raw admin_subnet_ids_for_packer)" >> $GITHUB_ENV
           echo "security_group_for_parcker=$(terraform output -raw secutity_group_packer_id)" >> $GITHUB_ENV
-        
+            
+      - name: Set up environment
+        run: |
+          echo "::add-mask::${{ secrets.vpc_id }}"
+          echo "::add-mask::${{ secrets.AWS_ACCESS_KEY }}"
+          echo "::add-mask::${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          echo "::add-mask::${{ env.rds_endpoint }}"
+          echo "::add-mask::${{ env.redis_endpoint }}"
+          echo "::add-mask::${{ env.redis_port }}"
+          echo "::add-mask::${{ env.cloud_region }}"
+          echo "::add-mask::${{ env.admin_subnet_ids }}"
+          echo "::add-mask::${{ env.security_group_for_parcker }}"
+
       - name: Run Packer
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           packer init ${{ env.packer-file }}
-          ::add-mask:: packer build -var "vpc_id=${{ secrets.vpc_id }}" \
+          packer build -var "vpc_id=${{ secrets.vpc_id }}" \
               -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
               -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               -var "rds_endpoint=${{ env.rds_endpoint }}" \
