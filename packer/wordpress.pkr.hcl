@@ -82,10 +82,6 @@ provisioner "shell" {
     "sudo apt clean",
     "sudo rm -rf /var/lib/apt/lists/*",
     "sudo apt update -y",
-    "sudo apt install -y awscli",
-    "aws configure set region ${var.aws_region}",
-    "DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text --access-key ${var.aws_access_key} --secret-key ${var.aws_secret_key} | jq -r '.DOCKER_HUB_USERNAME')",
-    "DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id prod/wordpress --query SecretString --output text --access-key ${var.aws_access_key} --secret-key ${var.aws_secret_key} | jq -r '.DOCKER_HUB_ACCESS_TOKEN')",
     "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg",
     "sudo install -m 0755 -d /etc/apt/keyrings",
     "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
@@ -102,12 +98,6 @@ provisioner "shell" {
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
     "sudo docker pull footballaws2/wordpress:latest",
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
-  ]
-
-  environment_vars = [
-      "aws_region=${var.aws_region}",
-      "aws_access_key=${var.aws_access_key}",
-      "aws_secret_key=${var.aws_secret_key}"
   ]
 
 }
