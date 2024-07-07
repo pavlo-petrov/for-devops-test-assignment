@@ -109,5 +109,10 @@ provisioner "shell" {
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
   ]
 
+  environment_vars = [
+      "DOCKER_HUB_USERNAME=${var.docker_hub_username}",
+      "DOCKER_HUB_ACCESS_TOKEN=${var.docker_hub_access_token}"
+  ]
+
 }
 }
