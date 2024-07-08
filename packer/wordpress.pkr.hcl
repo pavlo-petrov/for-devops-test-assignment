@@ -90,7 +90,6 @@ build {
 
 provisioner "shell" {
   inline = [
-    "script": "./packer/script/install_wordpress.sh",
     "sudo apt clean",
     "sudo rm -rf /var/lib/apt/lists/*",
     "sudo apt update -y",
@@ -127,5 +126,23 @@ provisioner "shell" {
       "WP_ADMIN_EMAIL=some@email.in.ua"
   ]
 
+}
+
+provisioner "shell" {
+  script       = "./packer/script/install_wordpress.sh"
+  pause_before = "10s"
+  environment_vars = [
+    "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
+    "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}"
+    "DB_HOST=${var.rds_endpoint}",
+    "DB_USER=admin",
+    "DB_PASSWORD=${}",
+    "DB_NAME=wordpress_db",
+    "WP_URL=wordpress-for-test.pp.ua",
+    "WP_TITLE=This_is_name_of_Web_site",
+    "WP_ADMIN_USER=admin",
+    "WP_ADMIN_PASSWORD=${}",
+    "WP_ADMIN_EMAIL=some@email.in.ua"
+  ]
 }
 }
