@@ -111,7 +111,7 @@ provisioner "shell" {
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest",
     "sudo rm /root/.docker/config.json"
   ]
-    "script": "packer/script/install_wordpress.sh"
+    "script": "./packer/script/install_wordpress.sh"
 
   environment_vars = [
       "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
