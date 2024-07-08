@@ -98,7 +98,7 @@ jobs:
           echo "::add-mask::${{ env.security_group_for_parcker }}"
           echo "::add-mask::${{ env.DOCKER_HUB_ACCESS_TOKEN }}"
           echo "::add-mask::${{ env.DOCKER_HUB_USERNAME }}"
-          echo "::add-mask::${{ env.password_for_mysql }}"
+          echo "::add-mask::${{ env.WORDPRESS_DB_PASSWD }}"
           
       - name: Run Packer
         run: |
