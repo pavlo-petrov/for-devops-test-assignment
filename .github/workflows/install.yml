@@ -62,27 +62,12 @@ jobs:
   
       - name: Apply Terraform
         run: cd ${{ env.terraform-file }} && terraform output
-      - name: mask outputs
-        run: |
-          echo "::add-mask::${{ secrets.vpc_id }}"
-          echo "::add-mask::${{ secrets.AWS_ACCESS_KEY }}"
-          echo "::add-mask::${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          echo "::add-mask::${{ env.rds_endpoint }}"
-          echo "::add-mask::${{ env.redis_endpoint }}"
-          echo "::add-mask::${{ env.redis_port }}"
-          echo "::add-mask::${{ env.cloud_region }}"
-          echo "::add-mask::${{ env.admin_subnet_ids }}"
-          echo "::add-mask::${{ env.security_group_for_parcker }}"
-          echo "::add-mask::${{ env.DOCKER_HUB_ACCESS_TOKEN }}"
-          echo "::add-mask::${{ env.DOCKER_HUB_USERNAME }}"
-          echo "::add-mask::${{ env.WORDPRESS_DB_PASSWD }}"
         
       - name: Get Terraform Outputs
         id: terraform_outputs
         run: |
           cd ${{ env.terraform-file }}
           echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "vpc_id=$(terraform output -raw vpc_id)"
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
           echo "redis_endpoint=$(terraform output -raw redis_endpoint)" >> $GITHUB_ENV
           echo "redis_port=$(terraform output -raw redis_port)" >> $GITHUB_ENV
@@ -93,8 +78,11 @@ jobs:
         run: |
           echo "Retrieving secrets from AWS Secrets Manager..."
           DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')
+          echo "::add-mask::$DOCKER_HUB_USERNAME"
           DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')
+          echo "::add-mask::$DOCKER_HUB_ACCESS_TOKEN"
           WORDPRESS_DB_PASSWD=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.password_for_mysql')
+          echo "::add-mask::$WORDPRESS_DB_PASSWD"
           echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" >> $GITHUB_ENV
           echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
           echo "WORDPRESS_DB_PASSWD=$WORDPRESS_DB_PASSWD" >> $GITHUB_ENV
