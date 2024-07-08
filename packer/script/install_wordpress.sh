@@ -3,8 +3,11 @@
 # parametrs of MySQL
 DB_NAME="wordpress_db"
 DB_USER="admin"
-DB_USER=$DB_PASSWORD
-DB_USER=$DB_HOST
+DB_PASSWORD=$DB_PASSWORD
+DB_HOST=$DB_HOST
+REDISD_HOST=$
+REDISD_PORT=$
+
 
 # Параметри WordPress
 WP_URL="http://wordpress-for-test.pp.ua"
