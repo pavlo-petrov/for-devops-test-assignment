@@ -114,16 +114,16 @@ provisioner "shell" {
 
   environment_vars = [
       "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
-      "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}"
+      "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}",
       "DB_HOST=${var.rds_endpoint}",
       "DB_USER=admin",
-      "DB_PASSWORD=${}",
+      "DB_PASSWORD=${var.wordpress_db_passwd}",
       "DB_NAME=wordpress_db",
       "WP_URL=wordpress-for-test.pp.ua",
       "WP_TITLE=This_is_name_of_Web_site",
       "WP_ADMIN_USER=admin",
-      "WP_ADMIN_PASSWORD=${}",
-      "WP_ADMIN_EMAIL=some@email.in.ua"
+      "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
+      "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua"
   ]
 
 }
@@ -133,16 +133,16 @@ provisioner "shell" {
   pause_before = "10s"
   environment_vars = [
     "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
-    "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}"
+    "DOCKER_HUB_ACCESS_TOKEN=${var.DOCKER_HUB_ACCESS_TOKEN}",
     "DB_HOST=${var.rds_endpoint}",
     "DB_USER=admin",
-    "DB_PASSWORD=${}",
+    "DB_PASSWORD=${var.wordpress_db_passwd}",
     "DB_NAME=wordpress_db",
     "WP_URL=wordpress-for-test.pp.ua",
     "WP_TITLE=This_is_name_of_Web_site",
     "WP_ADMIN_USER=admin",
-    "WP_ADMIN_PASSWORD=${}",
-    "WP_ADMIN_EMAIL=some@email.in.ua"
+    "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
+    "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua"
   ]
 }
 }
