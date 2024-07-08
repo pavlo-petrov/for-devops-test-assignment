@@ -129,7 +129,7 @@ provisioner "shell" {
 }
 
 provisioner "shell" {
-  script       = "./packer/script/install_wordpress.sh"
+  script       = "docker exec my-container ./packer/script/install_wordpress.sh"
   pause_before = "10s"
   environment_vars = [
     "DOCKER_HUB_USERNAME=${var.DOCKER_HUB_USERNAME}",
