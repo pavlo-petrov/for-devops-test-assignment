@@ -80,7 +80,7 @@ jobs:
           echo "Retrieving secrets from AWS Secrets Manager..."
           DOCKER_HUB_USERNAME=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_USERNAME')
           DOCKER_HUB_ACCESS_TOKEN=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.DOCKER_HUB_ACCESS_TOKEN')
-          WORDPRESS_DB_PASSWD=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.password_for_mysql')
+          password_for_mysql=$(aws secretsmanager get-secret-value --secret-id test_mysql_pass --query SecretString --output text | jq -r '.password_for_mysql')
           echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" >> $GITHUB_ENV
           echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
           echo "DOCKER_HUB_ACCESS_TOKEN=$WORDPRESS_DB_PASSWD" >> $GITHUB_ENV
@@ -98,7 +98,7 @@ jobs:
           echo "::add-mask::${{ env.security_group_for_parcker }}"
           echo "::add-mask::${{ env.DOCKER_HUB_ACCESS_TOKEN }}"
           echo "::add-mask::${{ env.DOCKER_HUB_USERNAME }}"
-          echo "::add-mask::${{ env.WORDPRESS_DB_PASSWD }}"
+          echo "::add-mask::${{ env.password_for_mysql }}"
           
       - name: Run Packer
         run: |
@@ -116,5 +116,5 @@ jobs:
               -var "security_group_for_parcker"=${{ env.security_group_for_parcker }} \
               -var "DOCKER_HUB_ACCESS_TOKEN"=${{ env.DOCKER_HUB_ACCESS_TOKEN }} \
               -var "DOCKER_HUB_USERNAME"=${{ env.DOCKER_HUB_USERNAME }} \
-              -var "wordpress_db_passwd"=${{ env.WORDPRESS_DB_PASSWD }} \
+              -var "wordpress_db_passwd"=${{ env.password_for_mysql }} \
               ${{ env.packer-file }}
