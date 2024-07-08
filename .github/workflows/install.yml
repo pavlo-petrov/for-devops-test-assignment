@@ -84,9 +84,6 @@ jobs:
           echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" >> $GITHUB_ENV
           echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
           echo "WORDPRESS_DB_PASSWD=$WORDPRESS_DB_PASSWD" >> $GITHUB_ENV
-          
-      - name: Set up environment
-        run: |
           echo "::add-mask::${{ secrets.vpc_id }}"
           echo "::add-mask::${{ secrets.AWS_ACCESS_KEY }}"
           echo "::add-mask::${{ secrets.AWS_SECRET_ACCESS_KEY }}"
