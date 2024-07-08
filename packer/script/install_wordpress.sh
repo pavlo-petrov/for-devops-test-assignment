@@ -10,16 +10,17 @@ DB_USER=$DB_HOST
 WP_URL="http://wordpress-for-test.pp.ua"
 WP_TITLE="My WordPress Site"
 WP_ADMIN_USER="paul"
-WP_ADMIN_PASSWORD=""
+WP_ADMIN_PASSWORD=$DB_PASSWORD
 WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
 
 # Створення бази даних та користувача MySQL
-DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+command="DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
 else
     echo "База даних ${DB_NAME} вже існує."
-fi
+fi"
+
 
 USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
 if [ -z "$USER_EXISTS" ]; then
