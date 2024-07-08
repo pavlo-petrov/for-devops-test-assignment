@@ -122,7 +122,7 @@ provisioner "shell" {
 provisioner "shell" {
   inline = [
     "docker exec my-container /var/www/html/install_wordpress.sh",
-    "rm /var/www/html/install_wordpress.sh"
+    "docker exec my-container rm /var/www/html/install_wordpress.sh"
   ]
   pause_before = "10s"
   environment_vars = [
