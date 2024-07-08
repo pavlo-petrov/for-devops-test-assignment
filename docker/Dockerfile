@@ -32,9 +32,6 @@ COPY wordpress/. ./
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-COPY packer/script/install_wordpress.sh ./
-RUN chmod +x 755 /var/www/html/install_wordpress.sh
-
 # Відкриття портів Apache
 EXPOSE 80
 
