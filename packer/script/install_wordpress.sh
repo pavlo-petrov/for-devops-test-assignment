@@ -14,6 +14,7 @@ WP_ADMIN_PASSWORD=$DB_PASSWORD
 WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
 
 # Створення бази даних та користувача MySQL
+ECHO $DB_HOST
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"

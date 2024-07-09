@@ -110,6 +110,7 @@ provisioner "shell" {
     "sudo docker pull footballaws2/wordpress:latest",
     "sudo rm /root/.docker/config.json",
     "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest",
+    "echo $DB_HOST",
     <<HEREDOC
 sudo docker exec my-container /bin/bash -c '
 DB_HOST=$DB_HOST \
