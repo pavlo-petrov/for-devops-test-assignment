@@ -1,5 +1,5 @@
 # Використовуємо офіційний образ PHP з Apache
-FROM php:7.4-apache
+FROM wordpress:latest
 
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
