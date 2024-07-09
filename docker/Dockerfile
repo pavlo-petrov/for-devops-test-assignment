@@ -14,7 +14,7 @@ RUN apt update && \
     libfreetype6-dev \
     unzip \
     git \
-    mysql \
+    mysql-client \
     php-redis \
     && rm -rf /var/lib/apt/lists/*
 
