@@ -24,15 +24,6 @@ else
     echo "База даних ${DB_NAME} вже існує."
 fi
 
-USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
-if [ -z "$USER_EXISTS" ]; then
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_PASSWORD}'@'%';"
-else
-    echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
-fi
-
-mysql -h ${DB_HOST} -u ${WP_ADMIN_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 
 
 
