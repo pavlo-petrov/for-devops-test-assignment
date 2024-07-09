@@ -1,16 +1,16 @@
 # Використовуємо офіційний образ PHP з Apache
-FROM php:7.4-apache
+FROM ununtu:latest
 
 # Оновлення та встановлення необхідних пакетів
-RUN apt update && \
-    apt install -y \
+RUN apt-get update && \
+    apt-get install -y \
     libzip-dev \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     unzip \
     git \
-    mysql \
+    mysql-client \
     php-redis \
     && rm -rf /var/lib/apt/lists/*
 
