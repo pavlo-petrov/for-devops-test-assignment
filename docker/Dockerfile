@@ -3,7 +3,7 @@ FROM php:7.4-apache
 
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
-    apt install -y \
+    apt install -y --no-install-recommends \
     libzip-dev \
     libpng-dev \
     libjpeg-dev \
