@@ -56,7 +56,7 @@ sudo sed -i "s/localhost/${DB_HOST}/" /var/www/html/wordpress/wp-config.php
 
 # Перевірка ��'єднання з базою даних
 
-php -r "
+sudo -u www-data php -r "
 \$mysqli = new mysqli('${DB_HOST}', '${DB_USER}', '${DB_PASSWORD}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);

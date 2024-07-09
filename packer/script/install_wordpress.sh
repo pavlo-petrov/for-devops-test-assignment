@@ -45,7 +45,7 @@ sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 
 # Перевірка ��'єднання з базою даних
 
--u www-data php -r "
+php -r "
 \$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_USER}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);
