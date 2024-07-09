@@ -15,7 +15,7 @@ env:
 
 jobs:
 ################################# docker front part ##################################
-  build_docker_frontend:
+  build_docker_wordpress:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +36,7 @@ jobs:
 
 ################################# packer ##################################
   packer_build:
+    needs: build_docker_wordpress
     runs-on: ubuntu-latest
 
     steps:
