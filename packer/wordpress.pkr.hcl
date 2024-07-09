@@ -109,7 +109,18 @@ provisioner "shell" {
     "echo $DOCKER_HUB_ACCESS_TOKEN | sudo docker login -u $DOCKER_HUB_USERNAME --password-stdin",
     "sudo docker pull footballaws2/wordpress:latest",
     "sudo rm /root/.docker/config.json",
-    "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest"
+    "sudo docker run -d -p 80:80 --restart always --name my-container --memory 500m footballaws2/wordpress:latest",
+    "docker exec my-container /bin/bash -c \
+      DB_HOST='$DB_HOST' \
+      DB_USER='$DB_USER' \
+      DB_PASSWORD='$DB_PASSWORD' \
+      DB_NAME='$DB_NAME' \
+      WP_URL='$WP_URL' \
+      WP_TITLE='$WP_TITLE' \
+      WP_ADMIN_USER='$WP_ADMIN_USER' \
+      WP_ADMIN_PASSWORD='$WP_ADMIN_PASSWORD' \
+      WP_ADMIN_EMAIL='$WP_ADMIN_EMAIL' \
+      /var/www/html/install_wordpress.sh"
   ]
 
   environment_vars = [

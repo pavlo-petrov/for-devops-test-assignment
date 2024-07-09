@@ -27,6 +27,7 @@ WORKDIR /var/www/html
 
 # Встановлення WordPress
 COPY wordpress/. ./
+COPY packer/script/install_wordpress.sh ./
 
 
 RUN chown -R www-data:www-data /var/www/html \
