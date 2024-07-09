@@ -4,10 +4,6 @@ FROM php:7.4-apache
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
     apt install -y \
-    software-properties-common && \
-    add-apt-repository ppa:ondrej/php && \
-    apt update && \
-    apt install -y \
     libzip-dev \
     libpng-dev \
     libjpeg-dev \
@@ -15,7 +11,6 @@ RUN apt update && \
     unzip \
     git \
     mysql-client \
-    php-redis \
     && rm -rf /var/lib/apt/lists/*
 
 # Налаштування PHP розширень
