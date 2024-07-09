@@ -2,8 +2,8 @@
 FROM wordpress:latest
 
 # Оновлення та встановлення необхідних пакетів
-RUN apt update && \
-    apt install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y \
     libzip-dev \
     libpng-dev \
     libjpeg-dev \
