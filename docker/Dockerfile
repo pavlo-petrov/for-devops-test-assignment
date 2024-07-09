@@ -10,6 +10,7 @@ RUN apt update && \
     libfreetype6-dev \
     unzip \
     git \
+    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Встановлення Redis cli
