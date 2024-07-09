@@ -10,7 +10,7 @@ RUN apt update && \
     libfreetype6-dev \
     unzip \
     git \
-    mysql-client \
+    php-redis \
     && rm -rf /var/lib/apt/lists/*
 
 # Налаштування PHP розширень
