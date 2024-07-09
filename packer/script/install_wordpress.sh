@@ -24,29 +24,29 @@ else
     echo "База даних ${DB_NAME} вже існує."
 fi
 
-USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
+USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${WP_ADMIN_USER}' AND host = '${DB_HOST}';" | grep "1")
 if [ -z "$USER_EXISTS" ]; then
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
 else
-    echo "Користувач ${DB_USER}@${DB_HOST} вже існує."
+    echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
 fi
 
-mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
+mysql -h ${DB_HOST} -u ${WP_ADMIN_USER} -p${WP_ADMIN_PASSWORD} -e "FLUSH PRIVILEGES;"
 
 
 
 # Створення файлу wp-config.php
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
-sed -i "s/username_here/${DB_USER}/" /var/www/html/wp-config.php
-sed -i "s/password_here/${DB_PASSWORD}/" /var/www/html/wp-config.php
+sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
+sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 
 # Перевірка ��'єднання з базою даних
 
 -u www-data php -r "
-\$mysqli = new mysqli('${DB_HOST}', '${DB_USER}', '${DB_PASSWORD}', '${DB_NAME}');
+\$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_USER}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);
 } else {
