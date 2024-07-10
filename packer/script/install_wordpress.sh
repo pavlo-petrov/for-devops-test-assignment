@@ -58,7 +58,8 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
 
 # Налаштування Apache
 a2enmod rewrite
-service apache2 restart
+apachectl graceful
+echo "apache restarted correct"
 
 # Автоматичне встановлення WordPress через WP-CLI
 cd /var/www/html/
