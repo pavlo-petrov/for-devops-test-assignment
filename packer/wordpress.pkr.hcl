@@ -127,6 +127,8 @@ my-container /bin/bash -c '
 /var/www/html/install_wordpress.sh
 '
 HEREDOC
+    ,
+    "sudo docker commit my-container footballaws2/wordpress:latest"
   ]
 
   environment_vars = [

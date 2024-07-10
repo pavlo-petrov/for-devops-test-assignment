@@ -294,7 +294,6 @@ resource "aws_security_group" "instance_sg" {
 locals {
   all_subnet_ids = concat(
     aws_subnet.public_subnet[*].id,
-    aws_subnet.admin_subnet[*].id
   )
 }
 
@@ -327,11 +326,11 @@ resource "aws_lb_listener" "https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:REGION:ACCOUNT_ID:certificate/CERTIFICATE_ID"
+  certificate_arn   = var.ssl_arn_path
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.default.arn
+    target_group_arn = aws_lb_target_group.asg1.arn
   }
 }
 
@@ -376,7 +375,7 @@ resource "aws_lb_listener_rule" "wpadmin_rule" {
 
   condition {
     host_header {
-      values = ["example.com"]
+      values = ["wordpress-for-test.pp.ua"]
     }
 
     path_pattern {
@@ -396,14 +395,14 @@ resource "aws_lb_listener_rule" "default_rule" {
 
   condition {
     host_header {
-      values = ["example.com"]
+      values = ["wordpress-for-test.pp.ua"]
     }
   }
 }
 
 resource "aws_launch_configuration" "wordpress" {
   name          = "wordpress-launch-configuration"
-  image_id      = "ami-12345678" # змініть на свій AMI
+  image_id      = "ami-04a4792c01a4251f2" # змініть на свій AMI
   instance_type = "t2.micro"
   security_groups = [aws_security_group.instance_sg.id]
 
@@ -412,12 +411,26 @@ resource "aws_launch_configuration" "wordpress" {
   }
 }
 
+locals {
+  admin_subnet_ids = concat(
+    aws_subnet.admin_subnet[*].id
+  )
+}
+
+locals {
+  public_subnet_ids = concat(
+    aws_subnet.public_subnet[*].id
+  )
+}
+
+
+
 resource "aws_autoscaling_group" "asg1" {
   launch_configuration = aws_launch_configuration.wordpress.id
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
-  vpc_zone_identifier  = aws_subnet.main[*].id
+  vpc_zone_identifier  = local.admin_subnet_ids
 
   tag {
     key                 = "Name"
@@ -436,7 +449,7 @@ resource "aws_autoscaling_group" "asg2" {
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
-  vpc_zone_identifier  = aws_subnet.main[*].id
+  vpc_zone_identifier  = local.public_subnet_ids
 
   tag {
     key                 = "Name"

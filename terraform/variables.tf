@@ -80,3 +80,9 @@ variable "secret_manager_secret_name" {
   type    = string
   default = "test_mysql_pass"
 }
+
+variable "ssl_arn_path" {
+  type = string
+  default = "arn:aws:acm:eu-west-1:975050270418:certificate/7de29d6d-24e7-4eaa-8a70-97984a30e238"
+  
+}
