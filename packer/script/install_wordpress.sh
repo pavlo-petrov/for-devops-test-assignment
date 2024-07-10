@@ -24,8 +24,15 @@ else
     echo "База даних ${DB_NAME} вже існує."
 fi
 
+USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
+if [ -z "$USER_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
+else
+    echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
+fi
 
-
+mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 
 # Створення файлу wp-config.php
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
@@ -34,10 +41,9 @@ sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
 sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 
-# Перевірка ��'єднання з базою даних
-
+# Перевірка з'єднання з базою даних
 php -r "
-\$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_USER}', '${DB_NAME}');
+\$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_PASSWORD}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);
 } else {
@@ -50,8 +56,6 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
 }
 "
 
-
-
 # Налаштування Apache
 a2enmod rewrite
 service apache2 restart
@@ -62,12 +66,10 @@ wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-
-
-if -u www-data wp core is-installed --path=/var/www/html/; then
+if sudo -u www-data wp core is-installed --path=/var/www/html/; then
   echo "WordPress вже встановлений. Пропускаємо установку."
 else
   # Виконання установки WordPress
-  -u www-data wp core install --url="${WP_URL}" --title="{WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
   echo "WordPress успішно встановлено!"
 fi
