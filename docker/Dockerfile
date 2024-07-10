@@ -11,6 +11,7 @@ RUN apt update && \
     unzip \
     git \
     default-mysql-client \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Встановлення Redis cli
