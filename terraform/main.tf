@@ -244,3 +244,208 @@ resource "aws_security_group" "packer_security_group" {
 #     public_key  = tls_private_key.ssh_key.public_key_openssh
 #   })
 # }
+
+
+##################### ELB + ASG ##################
+
+resource "aws_security_group" "alb_sg" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "instance_sg" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+locals {
+  all_subnet_ids = concat(
+    aws_subnet.public_subnet[*].id,
+    aws_subnet.admin_subnet[*].id
+  )
+}
+
+resource "aws_lb" "main" {
+  name               = "main-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = local.all_subnet_ids
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "arn:aws:acm:REGION:ACCOUNT_ID:certificate/CERTIFICATE_ID"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.default.arn
+  }
+}
+
+resource "aws_lb_target_group" "asg1" {
+  name        = "asg1-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_target_group" "asg2" {
+  name        = "asg2-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener_rule" "wpadmin_rule" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.asg1.arn
+  }
+
+  condition {
+    host_header {
+      values = ["example.com"]
+    }
+
+    path_pattern {
+      values = ["/wp-admin/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "default_rule" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.asg2.arn
+  }
+
+  condition {
+    host_header {
+      values = ["example.com"]
+    }
+  }
+}
+
+resource "aws_launch_configuration" "wordpress" {
+  name          = "wordpress-launch-configuration"
+  image_id      = "ami-12345678" # змініть на свій AMI
+  instance_type = "t2.micro"
+  security_groups = [aws_security_group.instance_sg.id]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "asg1" {
+  launch_configuration = aws_launch_configuration.wordpress.id
+  min_size             = 1
+  max_size             = 3
+  desired_capacity     = 1
+  vpc_zone_identifier  = aws_subnet.main[*].id
+
+  tag {
+    key                 = "Name"
+    value               = "asg1-instance"
+    propagate_at_launch = true
+  }
+
+  target_group_arns = [aws_lb_target_group.asg1.arn]
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+}
+
+resource "aws_autoscaling_group" "asg2" {
+  launch_configuration = aws_launch_configuration.wordpress.id
+  min_size             = 1
+  max_size             = 3
+  desired_capacity     = 1
+  vpc_zone_identifier  = aws_subnet.main[*].id
+
+  tag {
+    key                 = "Name"
+    value               = "asg2-instance"
+    propagate_at_launch = true
+  }
+
+  target_group_arns = [aws_lb_target_group.asg2.arn]
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+}
