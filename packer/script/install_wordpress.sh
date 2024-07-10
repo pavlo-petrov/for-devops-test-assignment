@@ -34,12 +34,16 @@ fi
 
 mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 
+echo "user added or exist"
+
 # Створення файлу wp-config.php
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
 sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
 sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
+
+echo "copied add setuped"
 
 # Перевірка з'єднання з базою даних
 php -r "
@@ -55,6 +59,7 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
     echo 'Database ${DB_NAME} selected successfully.';
 }
 "
+echo "connection with db exist"
 
 # Налаштування Apache
 a2enmod rewrite
@@ -66,6 +71,8 @@ cd /var/www/html/
 wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
+
+echo "wp client is installed or not"
 
 if sudo -u www-data wp core is-installed --path=/var/www/html/; then
   echo "WordPress вже встановлений. Пропускаємо установку."
