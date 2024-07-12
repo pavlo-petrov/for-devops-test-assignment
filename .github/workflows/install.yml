@@ -39,7 +39,7 @@ jobs:
     needs: build_docker_wordpress
     runs-on: ubuntu-latest
     outputs:
-      globalVar: ${{ env.AMI_CURRUNT_NAME }}
+      AMI_CURRUNT_NAME_GLOB: ${{ steps.set-output.outputs.AMI_CURRUNT_NAME }}
 
     steps:
       - name: Checkout repository
@@ -157,15 +157,15 @@ jobs:
           
       - name: Deploy to ASG_1
         run: |
-          echo ${{ env.AMI_CURRUNT_NAME }}
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ env.AMI_CURRUNT_NAME }}" --query "Images[0].ImageId" --output text)
+          echo ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
           echo $AMI_ID
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
 
       - name: Deploy to ASG_2
         run: |
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ env.AMI_CURRUNT_NAME }}" --query "Images[0].ImageId" --output text)
-          aws autoscaling update-auto-scaling-group --auto-scaling-group-name asg_name_user_id --launch-configuration-name your-launch-config --image-id $AMI_ID
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }}  --launch-configuration-name your-launch-config --image-id $AMI_ID
           
       - name: Wait for ASG_1 to be healthy
         run: |
