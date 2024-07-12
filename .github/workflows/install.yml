@@ -155,7 +155,9 @@ jobs:
           
       - name: Deploy to ASG_1
         run: |
+          echo ${{ env.AMI_CURRUNT_NAME }}
           AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ env.AMI_CURRUNT_NAME }}" --query "Images[0].ImageId" --output text)
+          echo $AMI_ID
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
 
       - name: Deploy to ASG_2
