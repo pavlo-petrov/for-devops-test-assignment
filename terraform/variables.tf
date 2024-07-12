@@ -86,3 +86,9 @@ variable "ssl_arn_path" {
   default = "arn:aws:acm:eu-west-1:975050270418:certificate/7de29d6d-24e7-4eaa-8a70-97984a30e238"
   
 }
+
+variable "hosted_zone_name" {
+  description = "The ID of the Route 53 Hosted Zone"
+  type        = string
+  default = "wordpress-for-test.pp.ua"
+}

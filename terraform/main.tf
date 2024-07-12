@@ -373,15 +373,19 @@ resource "aws_lb_listener_rule" "wpadmin_rule" {
     target_group_arn = aws_lb_target_group.asg1.arn
   }
 
-  condition {
-    host_header {
-      values = ["wordpress-for-test.pp.ua"]
-    }
 
+condition {
+    host_header {
+      values = [var.hosted_zone_name]
+    }
+  }
+
+condition {
     path_pattern {
       values = ["/wp-admin/*"]
     }
   }
+
 }
 
 resource "aws_lb_listener_rule" "default_rule" {
@@ -395,7 +399,7 @@ resource "aws_lb_listener_rule" "default_rule" {
 
   condition {
     host_header {
-      values = ["wordpress-for-test.pp.ua"]
+      values = [ var.hosted_zone_name ]
     }
   }
 }
@@ -461,4 +465,20 @@ resource "aws_autoscaling_group" "asg2" {
 
   health_check_type         = "EC2"
   health_check_grace_period = 300
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.selected.zone_id  
+  name    = "wordpress-for-test.pp.ua"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.main.dns_name
+    zone_id                = aws_lb.main.zone_id
+    evaluate_target_health = true
+  }
+}
+
+data "aws_route53_zone" "selected" {
+  name = var.hosted_zone_name
 }

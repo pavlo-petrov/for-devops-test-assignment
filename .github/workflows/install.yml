@@ -91,6 +91,8 @@ jobs:
       - name: Run Packer
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
+          AMI_CURRUNT_NAME="${{ env.ami-prefics }}$timeline"
+          echo "AMI_CURRUNT_NAME=$AMI_CURRUNT_NAME" >> $GITHUB_ENV
           packer init ${{ env.packer-file }}
           packer build -var "vpc_id=${{ secrets.vpc_id }}" \
               -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
@@ -105,4 +107,70 @@ jobs:
               -var "DOCKER_HUB_ACCESS_TOKEN"=${{ env.DOCKER_HUB_ACCESS_TOKEN }} \
               -var "DOCKER_HUB_USERNAME"=${{ env.DOCKER_HUB_USERNAME }} \
               -var "wordpress_db_passwd"=${{ env.WORDPRESS_DB_PASSWD }} \
+              -var "AMI_CURRUNT_NAME"=${{ env.AMI_CURRUNT_NAME }} \
               ${{ env.packer-file }}
+
+              
+  deploy:
+    needs: packer_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v3.1.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.cloud_region }}
+
+      - name: Set up Terraform 1.8.5
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Initialize Terraform
+        run: cd ${{ env.terraform-file }} && terraform init
+  
+      - name: Apply Terraform
+        run: cd ${{ env.terraform-file }} && terraform output
+        
+      - name: Get Terraform Outputs
+        id: terraform_outputs
+        run: |
+          cd ${{ env.terraform-file }}
+          echo "asg_name_admin_id=$(terraform output -raw asg_name_admin_id)" >> $GITHUB_ENV
+          echo "asg_name_user_id=$(terraform output -raw asg_name_user_id)" >> $GITHUB_ENV
+          echo "listener_admin_arn=$(terraform output -raw listener_admin_arn)" >> $GITHUB_ENV
+          echo "listener_user_arn=$(terraform output -raw listener_user_arn)" >> $GITHUB_ENV
+          
+          
+      - name: Deploy to ASG_1
+        run: |
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ env.AMI_CURRUNT_NAME }}" --query "Images[0].ImageId" --output text)
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
+
+      - name: Deploy to ASG_2
+        run: |
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ env.AMI_CURRUNT_NAME }}" --query "Images[0].ImageId" --output text)
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name asg_name_user_id --launch-configuration-name your-launch-config --image-id $AMI_ID
+          
+      - name: Wait for ASG_1 to be healthy
+        run: |
+          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_admin_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+
+      - name: Switch traffic to ASG_1
+        run: |
+          aws elbv2 modify-listener --listener-arn ${{ env.listener_admin_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_1
+
+      - name: Wait for ASG_2 to be healthy
+        run: |
+          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_user_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+
+      - name: Switch traffic to ASG_2
+        run: |
+          aws elbv2 modify-listener --listener-arn ${{ env.listener_user_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_2

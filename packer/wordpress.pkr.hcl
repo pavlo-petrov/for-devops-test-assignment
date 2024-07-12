@@ -30,12 +30,8 @@ variable "redis_port" {
   type = number
 }
 
-variable "timestamp" {
-  type = string
-  default = ""
-}
 
-variable "ami_name" {
+variable "AMI_CURRUNT_NAME" {
   type = string
   default = ""
 }
@@ -65,7 +61,7 @@ packer {
 }
 
 source "amazon-ebs" "wordpress" {
-  ami_name      = "${var.ami_name}-${var.timestamp}"
+  ami_name      = "${var.AMI_CURRUNT_NAME}"
   instance_type = "t2.micro"
   region        = var.aws_region
   vpc_id        = var.vpc_id
