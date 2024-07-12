@@ -39,7 +39,7 @@ jobs:
     needs: build_docker_wordpress
     runs-on: ubuntu-latest
     outputs:
-      AMI_CURRUNT_NAME_GLOB: ${{ steps.set-output.outputs.AMI_CURRUNT_NAME }}
+      AMI_CURRUNT_NAME_GLOB: ${{ steps.ami_step.outputs.AMI_CURRUNT_NAME }}
 
     steps:
       - name: Checkout repository
@@ -66,8 +66,8 @@ jobs:
       - name: Apply Terraform
         run: cd ${{ env.terraform-file }} && terraform output
         
-      - name: Get Terraform Outputs
-        id: terraform_outputs
+      - id: terraform_outputs
+        name: Get Terraform Outputs
         run: |
           cd ${{ env.terraform-file }}
           echo "vpc_id=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
@@ -92,6 +92,7 @@ jobs:
           
 
       - name: Set AMI name
+        id: ami_step
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           AMI_CURRUNT_NAME="${{ env.ami-prefics }}$timeline"
