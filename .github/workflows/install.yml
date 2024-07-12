@@ -157,13 +157,19 @@ jobs:
           
           
       - name: Deploy to ASG_1
+        env: 
+          ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+    
         run: |
-          echo ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          echo $ami_name
           AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
           echo $AMI_ID
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
 
       - name: Deploy to ASG_2
+        env: 
+          ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+
         run: |
           AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }}  --launch-configuration-name your-launch-config --image-id $AMI_ID
