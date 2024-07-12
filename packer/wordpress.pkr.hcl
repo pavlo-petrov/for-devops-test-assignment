@@ -61,7 +61,7 @@ packer {
 }
 
 source "amazon-ebs" "wordpress" {
-  ami_name      = "${var.AMI_CURRUNT_NAME}"
+  ami_name      = var.AMI_CURRUNT_NAME
   instance_type = "t2.micro"
   region        = var.aws_region
   vpc_id        = var.vpc_id
