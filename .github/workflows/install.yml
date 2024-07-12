@@ -91,12 +91,13 @@ jobs:
           echo "WORDPRESS_DB_PASSWD=$WORDPRESS_DB_PASSWD" >> $GITHUB_ENV
           
 
-      - name: Set AMI name
-        id: ami_step
+      - id: ami_step
+        name: Set ami ID 
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           AMI_CURRUNT_NAME="${{ env.ami-prefics }}$timeline"
           echo "AMI_CURRUNT_NAME=$AMI_CURRUNT_NAME" >> $GITHUB_ENV
+          echo "AMI_CURRUNT_NAME=$AMI_CURRUNT_NAME" >> $GITHUB_OUTPUT
 
       - name: Run Packer
         run: |
