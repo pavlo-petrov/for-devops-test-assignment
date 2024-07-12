@@ -162,7 +162,7 @@ jobs:
     
         run: |
           echo $ami_name
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
           echo $AMI_ID
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
 
@@ -171,7 +171,7 @@ jobs:
           ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
 
         run: |
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}" --query "Images[0].ImageId" --output text)
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }}  --launch-configuration-name your-launch-config --image-id $AMI_ID
           
       - name: Wait for ASG_1 to be healthy
