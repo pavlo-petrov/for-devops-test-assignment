@@ -33,7 +33,6 @@ variable "redis_port" {
 
 variable "AMI_CURRUNT_NAME" {
   type = string
-  default = ""
 }
 
 variable "security_group_for_parcker" {
