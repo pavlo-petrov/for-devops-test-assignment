@@ -38,6 +38,8 @@ jobs:
   packer_build:
     needs: build_docker_wordpress
     runs-on: ubuntu-latest
+    outputs:
+      globalVar: ${{ env.AMI_CURRUNT_NAME }}
 
     steps:
       - name: Checkout repository
