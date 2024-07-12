@@ -88,10 +88,15 @@ jobs:
           echo "DOCKER_HUB_ACCESS_TOKEN=$DOCKER_HUB_ACCESS_TOKEN" >> $GITHUB_ENV
           echo "WORDPRESS_DB_PASSWD=$WORDPRESS_DB_PASSWD" >> $GITHUB_ENV
           
-      - name: Run Packer
+
+      - name: Set AMI name
         run: |
           timeline="$(date +'%Y%m%d%H%M%S')"
           AMI_CURRUNT_NAME="${{ env.ami-prefics }}$timeline"
+          echo "AMI_CURRUNT_NAME=$AMI_CURRUNT_NAME" >> $GITHUB_ENV
+
+      - name: Run Packer
+        run: |
           echo "AMI_CURRUNT_NAME=$AMI_CURRUNT_NAME" >> $GITHUB_ENV
           packer init ${{ env.packer-file }}
           packer build -var "vpc_id=${{ secrets.vpc_id }}" \
