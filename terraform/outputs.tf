@@ -98,3 +98,7 @@ output "launch_template_public_id" {
 output "iam_profile_for_s3" {
   value = aws_iam_instance_profile.ec2_instance_profile.name
 }
+
+output "AWS_S3_WORDPRESS_NAME_S3" {
+  value = var.s3_bucket_for_wordpress_name
+}
