@@ -156,7 +156,7 @@ jobs:
           echo "listener_admin_arn=$(terraform output -raw listener_admin_arn)" >> $GITHUB_ENV
           echo "listener_public_arn=$(terraform output -raw listener_public_arn)" >> $GITHUB_ENV
           echo "launch_configuration_public_id=$(terraform output -raw launch_configuration_public_id)" >> $GITHUB_ENV
-          echo "launch_configuration__admin_id=$(terraform output -raw launch_configuration_admin_id)" >> $GITHUB_ENV
+          echo "launch_configuration_admin_id=$(terraform output -raw launch_configuration_admin_id)" >> $GITHUB_ENV
           
       - name: Deploy to ASG_1
         env: 
