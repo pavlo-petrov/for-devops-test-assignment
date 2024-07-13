@@ -87,9 +87,13 @@ resource "aws_route_table_association" "admin_subnet_association" {
 ############## MySQL #################
 
 # DB Subnet Group
-resource "aws_db_subnet_group" "default" {
-  name       = "my-db-subnet-group"
+resource "aws_db_subnet_group" "default_db" {
+  name       = "my-db-subnet-group-1"
   subnet_ids = [for subnet in aws_subnet.database_subnet[*] : subnet.id]
+
+  depends_on = [
+    aws_subnet.database_subnet
+  ]
 
   tags = {
     Name = "My DB subnet group"
@@ -135,7 +139,7 @@ resource "aws_db_instance" "default" {
   storage_type            = "gp2"
   username                = var.db_username
   password                = jsondecode(data.aws_secretsmanager_secret_version.example.secret_string)["password_for_mysql"] 
-  db_subnet_group_name    = aws_db_subnet_group.default.name
+  db_subnet_group_name    = aws_db_subnet_group.default_db.name
   vpc_security_group_ids  = [aws_security_group.db.id]
   availability_zone       = var.db_rds_avail_zone[0]
   port                    = 3306
@@ -152,7 +156,7 @@ resource "aws_db_instance" "default" {
   monitoring_interval     = 0  # Вимкнути Enhanced Monitoring
 
   depends_on = [
-    aws_subnet.database_subnet
+    aws_db_subnet_group.default_db
   ]
 
   tags = {
@@ -189,20 +193,6 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   security_group_ids   = [aws_security_group.db.id]
 }
 
-######################## ELB ##############
-
-# resource "aws_elb" "example_elb" {
-#   name               = "example-elb"
-#   availability_zones = var.azs
-#   listener {
-#     lb_port           = 80
-#     lb_protocol       = "http"
-#     instance_port     = 80
-#     instance_protocol = "http"
-#   }
-#  subnets              = ["subnet-0c3d66cdcc7b8b9db", "subnet-0f2a42aba3e897ff7", "subnet-0cce7261a1367067b"]
-# }
-
 ##################### security group for parcker #################
 resource "aws_security_group" "packer_security_group" {
   name        = "packer_security_group"
@@ -224,27 +214,6 @@ resource "aws_security_group" "packer_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# #################### add SSH kay for rsync ################### 
-
-# resource "tls_private_key" "ssh_key" {
-#   algorithm = "RSA"
-#   rsa_bits  = 4096
-# }
-
-# resource "aws_secretsmanager_secret" "ssh_keys" {
-#   name = "ssh_key_pair"
-# }
-
-# resource "aws_secretsmanager_secret_version" "ssh_keys_version" {
-#   secret_id = aws_secretsmanager_secret.ssh_keys.id
-
-#   secret_string = jsonencode({
-#     private_key = tls_private_key.ssh_key.private_key_pem
-#     public_key  = tls_private_key.ssh_key.public_key_openssh
-#   })
-# }
-
 
 ##################### ELB + ASG ##################
 
