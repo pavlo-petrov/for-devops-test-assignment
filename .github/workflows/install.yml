@@ -157,37 +157,98 @@ jobs:
           echo "listener_public_arn=$(terraform output -raw listener_public_arn)" >> $GITHUB_ENV
           echo "launch_configuration_public_id=$(terraform output -raw launch_configuration_public_id)" >> $GITHUB_ENV
           echo "launch_configuration_admin_id=$(terraform output -raw launch_configuration_admin_id)" >> $GITHUB_ENV
+
+      - name: Update Admin Auto Scaling Group with new AMI
+        env:
+          AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          LAUNCH_TEMPLATE_ID: ${{ env.launch_configuration_admin_id }}
+          ASG_NAME: ${{ env.asg_name_admin_id }}
+        run: |
+          NEW_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-id $LAUNCH_TEMPLATE_ID \
+            --source-version 1 \
+            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
+            --query 'LaunchTemplateVersion.VersionNumber' \
+            --output text)
+
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name $ASG_NAME \
+          --launch-template "LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version=$NEW_VERSION" \
+          --min-size 1 \
+          --max-size 2 \
+          --desired-capacity 1 \
+          --termination-policies "OldestInstance"
+
+      - name: Trigger Instance Refresh for Admin ASG
+        run: |
+          aws autoscaling start-instance-refresh \
+          --auto-scaling-group-name ${{ env.asg_name_admin_id }} \
+          --preferences '{"MinHealthyPercentage": 90, "InstanceWarmup": 300}'
+
+      - name: Update Public Auto Scaling Group with new AMI
+        env:
+          AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          LAUNCH_TEMPLATE_ID: ${{ env.launch_configuration_public_id }}
+          ASG_NAME: ${{ env.asg_name_public_id }}
+        run: |
+          NEW_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-id $LAUNCH_TEMPLATE_ID \
+            --source-version 1 \
+            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
+            --query 'LaunchTemplateVersion.VersionNumber' \
+            --output text)
+
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name $ASG_NAME \
+          --launch-template "LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version=$NEW_VERSION" \
+          --min-size 1 \
+          --max-size 2 \
+          --desired-capacity 1 \
+          --termination-policies "OldestInstance"
+
+      - name: Trigger Instance Refresh for Public ASG
+        run: |
+          aws autoscaling start-instance-refresh \
+          --auto-scaling-group-name ${{ env.asg_name_public_id }} \
+          --preferences '{"MinHealthyPercentage": 90, "InstanceWarmup": 300}'
+
           
-      - name: Deploy to ASG_1
-        env: 
-          ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+
+
+
+          
+      # - name: Deploy to ASG_1
+      #   env: 
+      #     ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
     
-        run: |
-          echo $ami_name
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
-          echo $AMI_ID
-          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name ${{ env.launch_configuration_admin_id }} --image-id $AMI_ID
+      #   run: |
+      #     echo $ami_name
+      #     AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
+      #     echo $AMI_ID
+      #     echo ${{ env.asg_name_admin_id }}
+      #     eccho ${{ env.launch_configuration_admin_id }}
+      #     aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name ${{ env.launch_configuration_admin_id }} --image-id $AMI_ID
 
-      - name: Deploy to ASG_2
-        env: 
-          ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+      # - name: Deploy to ASG_2
+      #   env: 
+      #     ami_name: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
 
-        run: |
-          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
-          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_public_id }}  --launch-configuration-name ${{ env.launch_configuration_public_id }} --image-id $AMI_ID
+      #   run: |
+      #     AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
+      #     aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_public_id }}  --launch-configuration-name ${{ env.launch_configuration_public_id }} --image-id $AMI_ID
           
-      - name: Wait for ASG_1 to be healthy
-        run: |
-          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+      # - name: Wait for ASG_1 to be healthy
+      #   run: |
+      #     aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
 
-      - name: Switch traffic to ASG_1
-        run: |
-          aws elbv2 modify-listener --listener-arn ${{ env.listener_admin_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_1
+      # - name: Switch traffic to ASG_1
+      #   run: |
+      #     aws elbv2 modify-listener --listener-arn ${{ env.listener_admin_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_1
 
-      - name: Wait for ASG_2 to be healthy
-        run: |
-          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+      # - name: Wait for ASG_2 to be healthy
+      #   run: |
+      #     aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
 
-      - name: Switch traffic to ASG_2
-        run: |
-          aws elbv2 modify-listener --listener-arn ${{ env.listener_public_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_2
+      # - name: Switch traffic to ASG_2
+      #   run: |
+      #     aws elbv2 modify-listener --listener-arn ${{ env.listener_public_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_2
