@@ -118,6 +118,7 @@ sudo docker exec \
 -e WP_ADMIN_USER=$WP_ADMIN_USER \
 -e WP_ADMIN_PASSWORD=$WP_ADMIN_PASSWORD \
 -e WP_ADMIN_EMAIL=$WP_ADMIN_EMAIL \
+-e REDIS_ENDPOINT=$REDIS_ENDPOINT \
 my-container /bin/bash -c '
 /var/www/html/install_wordpress.sh
 '
@@ -137,7 +138,8 @@ HEREDOC
       "WP_TITLE=This_is_name_of_Web_site",
       "WP_ADMIN_USER=admin",
       "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
-      "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua"
+      "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua",
+      "REDIS_ENDPOINT=redis_endpoint"
   ]
 }
 }

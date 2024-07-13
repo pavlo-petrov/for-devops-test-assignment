@@ -80,5 +80,13 @@ if sudo -u www-data wp core is-installed --path=/var/www/html/; then
 else
   # Виконання установки WordPress
   sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
+  sudo -u www-data wp plugin install redis-cache --activate
+  WP_CONFIG_PATH="/var/www/html/wp-config.php"
+if ! grep -q "WP_REDIS_HOST" "$WP_CONFIG_PATH"; then
+  echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
+  echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
+  echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
+fi
+  wp redis enable
   echo "WordPress успішно встановлено!"
 fi
