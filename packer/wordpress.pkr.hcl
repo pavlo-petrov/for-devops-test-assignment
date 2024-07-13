@@ -50,6 +50,19 @@ variable "wordpress_db_passwd" {
   type = string
 }
 
+variable "iam_profile_for_s3" {
+  type = string
+}
+
+variable "AWS_REGION" {
+  type = string
+}
+
+variable "AWS_S3_WORDPRESS_NAME_S3" {
+  type = string
+}
+
+
 packer {
   required_plugins {
     amazon = {
@@ -66,6 +79,7 @@ source "amazon-ebs" "wordpress" {
   vpc_id        = var.vpc_id
   subnet_id     = var.admin_subnet_ids
   security_group_id = var.security_group_for_parcker
+  iam_instance_profile = var.iam_profile_for_s3
   source_ami_filter {
     filters = {
       architecture        = "x86_64"
@@ -119,6 +133,8 @@ sudo docker exec \
 -e WP_ADMIN_PASSWORD=$WP_ADMIN_PASSWORD \
 -e WP_ADMIN_EMAIL=$WP_ADMIN_EMAIL \
 -e REDIS_ENDPOINT=$REDIS_ENDPOINT \
+-e AWS_S3_WORDPRESS_NAME_S3 \
+-e AWS_REGION \
 my-container /bin/bash -c '
 /var/www/html/install_wordpress.sh
 '
@@ -139,6 +155,8 @@ HEREDOC
       "WP_ADMIN_USER=admin",
       "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
       "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua",
+      "AWS_S3_WORDPRESS_NAME_S3=${var.AWS_S3_WORDPRESS_NAME_S3}",
+      "AWS_REGION=${var.AWS_REGION}
       "REDIS_ENDPOINT=redis_endpoint"
   ]
 }

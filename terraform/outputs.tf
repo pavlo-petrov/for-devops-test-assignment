@@ -94,3 +94,7 @@ output "launch_template_admin_id" {
 output "launch_template_public_id" {
   value = aws_launch_template.wordpress_admin.id
 }
+
+output "iam_profile_for_s3" {
+  value = aws_iam_instance_profile.ec2_instance_profile.name
+}

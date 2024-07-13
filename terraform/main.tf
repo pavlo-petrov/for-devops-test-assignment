@@ -273,7 +273,7 @@ locals {
 }
 
 resource "aws_lb" "admin_alb" {
-  name               = "main-lb-main"
+  name               = "load-balancer-admin"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -281,7 +281,7 @@ resource "aws_lb" "admin_alb" {
 }
 
 resource "aws_lb" "public_alb" {
-  name               = "main-lb-admin"
+  name               = "load-balancer-public"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -362,6 +362,11 @@ resource "aws_lb_target_group" "asg1" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+  stickiness {
+    type                = "lb_cookie"
+    cookie_duration     = 3600  # 1 day
+    enabled             = true
+  }
 }
 
 resource "aws_lb_target_group" "asg2" {
@@ -428,6 +433,10 @@ resource "aws_launch_template" "wordpress_admin" {
   network_interfaces {
     security_groups             = [aws_security_group.instance_sg.id]
     associate_public_ip_address = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
   tag_specifications {
@@ -508,8 +517,8 @@ resource "aws_route53_record" "www" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.public_alb.dns_name
-    zone_id                = aws_lb.public_alb.zone_id
+    name                   = aws_lb.admin_alb.dns_name
+    zone_id                = aws_lb.admin_alb.zone_id
     evaluate_target_health = true
   }
 }
@@ -517,3 +526,90 @@ resource "aws_route53_record" "www" {
 data "aws_route53_zone" "selected" {
   name = var.hosted_zone_name
 }
+
+############# S3 bucket for wp offline files ########### 
+
+# Створення S3 бакету
+resource "aws_s3_bucket" "wordpress_bucket" {
+  bucket = var.s3_bucket_for_wordpress_name
+  acl    = "private"
+}
+
+# Політика для доступу користувачів до S3 бакету
+data "aws_iam_policy_document" "user_access_policy" {
+  statement {
+    actions   = ["s3:GetObject", "s3:ListBucket"]
+    resources = ["${aws_s3_bucket.wordpress_bucket.arn}/*", "${aws_s3_bucket.wordpress_bucket.arn}"]
+  }
+}
+
+resource "aws_iam_policy" "user_access_policy" {
+  name        = "WordpressUserAccessPolicy"
+  description = "Access policy for users to read from the Wordpress S3 bucket"
+  policy      = data.aws_iam_policy_document.user_access_policy.json
+}
+
+# Створення групи та додавання політики до групи
+resource "aws_iam_group" "wordpress_users_group" {
+  name = "WordpressUsersGroup"
+}
+
+resource "aws_iam_group_policy_attachment" "attach_user_policy" {
+  group      = aws_iam_group.wordpress_users_group.name
+  policy_arn = aws_iam_policy.user_access_policy.arn
+}
+
+# Політика для доступу серверів до S3 бакету
+data "aws_iam_policy_document" "ec2_access_policy" {
+  statement {
+    actions   = ["s3:PutObject", "s3:GetObject", "s3:ListBucket"]
+    resources = ["${aws_s3_bucket.wordpress_bucket.arn}/*", "${aws_s3_bucket.wordpress_bucket.arn}"]
+  }
+}
+
+resource "aws_iam_policy" "ec2_access_policy" {
+  name        = "WordpressEC2AccessPolicy"
+  description = "Access policy for EC2 instances to read and write to the Wordpress S3 bucket"
+  policy      = data.aws_iam_policy_document.ec2_access_policy.json
+}
+
+# Створення IAM ролі для EC2 інстансів
+resource "aws_iam_role" "ec2_role" {
+  name = "WordpressEC2Role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Прив'язка політики до ролі
+resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.ec2_access_policy.arn
+}
+
+# Профіль інстансу для використання IAM ролі
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "WordpressEC2InstanceProfile"
+  role = aws_iam_role.ec2_role.name
+}
+
+# # Приклад EC2 інстансу з прив'язкою до IAM профілю
+# resource "aws_instance" "wordpress_instance" {
+#   ami           = "ami-12345678"
+#   instance_type = "t2.micro"
+
+#   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+
+#   # Інші налаштування EC2 інстансу
+#   subnet_id = "subnet-abcdef1234567890"
+# }

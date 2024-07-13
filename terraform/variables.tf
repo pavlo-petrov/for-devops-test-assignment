@@ -92,3 +92,9 @@ variable "hosted_zone_name" {
   type        = string
   default = "wordpress-for-test.pp.ua"
 }
+
+variable "s3_bucket_for_wordpress_name" {
+  description = "setup this first"
+  type        = string
+  default = "my-wordpress-media-bucket"
+}

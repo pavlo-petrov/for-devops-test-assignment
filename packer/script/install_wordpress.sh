@@ -7,11 +7,15 @@ DB_PASSWORD=$DB_PASSWORD
 DB_HOST=$DB_HOST
 
 # Параметри WordPress
-WP_URL="http://wordpress-for-test.pp.ua"
+WP_URL="https://wordpress-for-test.pp.ua"
 WP_TITLE="My WordPress Site"
 WP_ADMIN_USER="paul"
 WP_ADMIN_PASSWORD=$DB_PASSWORD
 WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
+
+# Параметри для S3
+MY_REGION=$AWS_RIGION
+MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
 # Створення бази даних та користувача MySQL
 echo "DB_HOST: $DB_HOST"
@@ -89,4 +93,15 @@ if ! grep -q "WP_REDIS_HOST" "$WP_CONFIG_PATH"; then
 fi
   wp redis enable
   echo "WordPress успішно встановлено!"
+fi
+
+# Встановлення та налаштування плагіну для S3
+PLUGIN_SLUG="amazon-s3-and-cloudfront"
+if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html/; then
+  sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
+  # Налаштування плагіну можна додати сюди, наприклад:
+  sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","bucket":"YOUR_BUCKET_NAME","region":"YOUR_REGION"}' --type=json --path=/var/www/html/
+else
+  echo "Плагін ${PLUGIN_SLUG} вже встановлений."
+  sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
 fi
