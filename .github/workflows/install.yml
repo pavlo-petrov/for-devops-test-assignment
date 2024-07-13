@@ -155,13 +155,13 @@ jobs:
           echo "asg_name_public_id=$(terraform output -raw asg_name_public_id)" >> $GITHUB_ENV
           echo "listener_admin_arn=$(terraform output -raw listener_admin_arn)" >> $GITHUB_ENV
           echo "listener_public_arn=$(terraform output -raw listener_public_arn)" >> $GITHUB_ENV
-          echo "launch_configuration_public_id=$(terraform output -raw launch_configuration_public_id)" >> $GITHUB_ENV
-          echo "launch_configuration_admin_id=$(terraform output -raw launch_configuration_admin_id)" >> $GITHUB_ENV
+          echo "launch_template_public_id=$(terraform output -raw launch_template_public_id)" >> $GITHUB_ENV
+          echo "launch_template_admin_id=$(terraform output -raw launch_template_admin_id)" >> $GITHUB_ENV
 
       - name: Update Admin Auto Scaling Group with new AMI
         env:
           AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
-          LAUNCH_TEMPLATE_ID: ${{ env.launch_configuration_admin_id }}
+          LAUNCH_TEMPLATE_ID: ${{ env.launch_template_admin_id }}
           ASG_NAME: ${{ env.asg_name_admin_id }}
         run: |
           NEW_VERSION=$(aws ec2 create-launch-template-version \
@@ -188,7 +188,7 @@ jobs:
       - name: Update Public Auto Scaling Group with new AMI
         env:
           AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
-          LAUNCH_TEMPLATE_ID: ${{ env.launch_configuration_public_id }}
+          LAUNCH_TEMPLATE_ID: ${{ env.launch_template_public_id }}
           ASG_NAME: ${{ env.asg_name_public_id }}
         run: |
           NEW_VERSION=$(aws ec2 create-launch-template-version \

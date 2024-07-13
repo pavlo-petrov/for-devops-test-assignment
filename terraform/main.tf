@@ -419,30 +419,50 @@ resource "aws_lb_listener_rule" "default_rule" {
   }
 }
 
-resource "aws_launch_configuration" "wordpress_admin" {
-  name          = "wordpress-launch-configuration-admin"
+resource "aws_launch_template" "wordpress_admin" {
+  name          = "wordpress-launch-template-admin"
   image_id      = "ami-0c38b837cd80f13bb" # змініть на свій AMI
   instance_type = "t2.micro"
-  security_groups = [aws_security_group.instance_sg.id]
+  key_name      = "eu-west-1" # Змініть на свій ключ SSH
 
-  lifecycle {
-    create_before_destroy = true
+  network_interfaces {
+    security_groups             = [aws_security_group.instance_sg.id]
+    associate_public_ip_address = true
   }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "wordpress-admin"
+    }
+  }
+
 }
 
-resource "aws_launch_configuration" "wordpress_public" {
-  name          = "wordpress-launch-configuration-public"
-  image_id      = "ami-0c38b837cd80f13bb" # змініть на свій AMI
+resource "aws_launch_template" "wordpress_public" {
+  name          = "wordpress-launch-template-public"
+  image_id      = "ami-0c38b837cd80f13bb"
   instance_type = "t2.micro"
-  security_groups = [aws_security_group.instance_sg.id]
+  key_name      = "eu-west-1"
 
-  lifecycle {
-    create_before_destroy = true
+  network_interfaces {
+    security_groups             = [aws_security_group.instance_sg.id]
+    associate_public_ip_address = true
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "wordpress-public"
+    }
   }
 }
 
 resource "aws_autoscaling_group" "asg1" {
-  launch_configuration = aws_launch_configuration.wordpress_admin.id
+  launch_template {
+    id = aws_launch_template.wordpress_admin.id
+    version = "$Latest"
+  } 
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
@@ -461,7 +481,10 @@ resource "aws_autoscaling_group" "asg1" {
 }
 
 resource "aws_autoscaling_group" "asg2" {
-  launch_configuration = aws_launch_configuration.wordpress_public.id
+  launch_template {
+    id = aws_launch_template.wordpress_public.id
+    version = "$Latest"
+  } 
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
