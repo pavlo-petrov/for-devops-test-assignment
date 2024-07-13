@@ -160,12 +160,13 @@ jobs:
 
       - name: Update Admin Auto Scaling Group with new AMI
         env:
-          AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          AMI_NAME: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
           LAUNCH_TEMPLATE_ID: ${{ env.launch_template_admin_id }}
           ASG_NAME: ${{ env.asg_name_admin_id }}
         run: |
           echo "start new_version"
-          echo $AMI_ID
+          echo $AMI_NAME
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$AMI_NAME" --query "Images[0].ImageId" --output text)
           echo $LAUNCH_TEMPLATE_ID
           echo $ASG_NAME
           NEW_VERSION=$(aws ec2 create-launch-template-version \
@@ -193,10 +194,12 @@ jobs:
 
       - name: Update Public Auto Scaling Group with new AMI
         env:
-          AMI_ID: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
+          AMI_NAME: ${{ needs.packer_build.outputs.AMI_CURRUNT_NAME_GLOB }}
           LAUNCH_TEMPLATE_ID: ${{ env.launch_template_public_id }}
           ASG_NAME: ${{ env.asg_name_public_id }}
         run: |
+          AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$AMI_NAME" --query "Images[0].ImageId" --output text)
+
           NEW_VERSION=$(aws ec2 create-launch-template-version \
             --launch-template-id $LAUNCH_TEMPLATE_ID \
             --source-version 1 \
