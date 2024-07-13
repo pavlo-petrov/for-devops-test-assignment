@@ -41,7 +41,7 @@ mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 echo "!!!!!!user added or exist!!!!!!"
 
 # Створення файлу wp-config.php
-cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+sudo -u www-data cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
 sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
 sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
@@ -101,7 +101,8 @@ if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html
   sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
   # Налаштування плагіну можна додати сюди, наприклад:
   # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}' --type=json --path=/var/www/html/
-    sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
+  #  sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
+  sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/html/
 else
   echo "Плагін ${PLUGIN_SLUG} вже встановлений."
   sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
