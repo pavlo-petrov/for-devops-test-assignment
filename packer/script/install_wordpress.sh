@@ -100,7 +100,8 @@ PLUGIN_SLUG="amazon-s3-and-cloudfront"
 if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html/; then
   sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
   # Налаштування плагіну можна додати сюди, наприклад:
-  sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","bucket":"YOUR_BUCKET_NAME","region":"YOUR_REGION"}' --type=json --path=/var/www/html/
+  # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}' --type=json --path=/var/www/html/
+    sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
 else
   echo "Плагін ${PLUGIN_SLUG} вже встановлений."
   sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
