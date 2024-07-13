@@ -304,7 +304,7 @@ locals {
 }
 
 resource "aws_lb" "admin_alb" {
-  name               = "main-lb"
+  name               = "main-lb-main"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -312,7 +312,7 @@ resource "aws_lb" "admin_alb" {
 }
 
 resource "aws_lb" "public_alb" {
-  name               = "main-lb"
+  name               = "main-lb-admin"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -451,8 +451,8 @@ resource "aws_lb_listener_rule" "default_rule" {
 }
 
 resource "aws_launch_configuration" "wordpress_admin" {
-  name          = "wordpress-launch-configuration"
-  image_id      = "ami-04a4792c01a4251f2" # змініть на свій AMI
+  name          = "wordpress-launch-configuration-admin"
+  image_id      = "ami-0c38b837cd80f13bb" # змініть на свій AMI
   instance_type = "t2.micro"
   security_groups = [aws_security_group.instance_sg.id]
 
@@ -462,8 +462,8 @@ resource "aws_launch_configuration" "wordpress_admin" {
 }
 
 resource "aws_launch_configuration" "wordpress_public" {
-  name          = "wordpress-launch-configuration"
-  image_id      = "ami-04a4792c01a4251f2" # змініть на свій AMI
+  name          = "wordpress-launch-configuration-public"
+  image_id      = "ami-0c38b837cd80f13bb" # змініть на свій AMI
   instance_type = "t2.micro"
   security_groups = [aws_security_group.instance_sg.id]
 

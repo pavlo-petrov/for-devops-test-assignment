@@ -87,10 +87,10 @@ output "listener_public_arn" {
   value = aws_lb_listener_rule.default_rule.arn
 }
 
-output "launch_configuration_public_id" {
-  value = aws_launch_configuration.wordpress_public
+output "launch_configuration_admin_id" {
+  value = aws_launch_configuration.wordpress_public.id
 }
 
 output "launch_configuration_public_id" {
-  value = aws_launch_configuration.wordpress_admin
+  value = aws_launch_configuration.wordpress_admin.id
 }
