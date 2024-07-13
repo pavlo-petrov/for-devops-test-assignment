@@ -120,7 +120,6 @@ jobs:
               -var "AMI_CURRUNT_NAME"=${{ env.AMI_CURRUNT_NAME }} \
               -var "iam_profile_for_s3"=${{ env.iam_profile_for_s3 }} \
               -var "AWS_S3_WORDPRESS_NAME_S3"=${{ env.AWS_S3_WORDPRESS_NAME_S3 }} \
-              -var "AWS_RIGION"=${{ env.cloud_region }} \
               ${{ env.packer-file }}
 
               

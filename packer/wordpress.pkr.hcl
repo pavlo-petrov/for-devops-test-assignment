@@ -54,10 +54,6 @@ variable "iam_profile_for_s3" {
   type = string
 }
 
-variable "AWS_REGION" {
-  type = string
-}
-
 variable "AWS_S3_WORDPRESS_NAME_S3" {
   type = string
 }
@@ -156,7 +152,7 @@ HEREDOC
       "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
       "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua",
       "AWS_S3_WORDPRESS_NAME_S3=${var.AWS_S3_WORDPRESS_NAME_S3}",
-      "AWS_REGION=${var.AWS_REGION}",
+      "AWS_REGION=${var.aws_region}",
       "REDIS_ENDPOINT=${var.redis_endpoint}"
   ]
 }
