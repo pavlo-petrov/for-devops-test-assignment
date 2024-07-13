@@ -292,21 +292,35 @@ resource "aws_security_group" "instance_sg" {
 }
 
 locals {
-  all_subnet_ids = concat(
-    aws_subnet.public_subnet[*].id,
+  admin_subnet_ids = concat(
+    aws_subnet.admin_subnet[*].id
   )
 }
 
-resource "aws_lb" "main" {
+locals {
+  public_subnet_ids = concat(
+    aws_subnet.public_subnet[*].id
+  )
+}
+
+resource "aws_lb" "admin_alb" {
   name               = "main-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = local.all_subnet_ids
+  subnets            = local.admin_subnet_ids
 }
 
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.main.arn
+resource "aws_lb" "public_alb" {
+  name               = "main-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = local.public_subnet_ids
+}
+
+resource "aws_lb_listener" "http_admin" {
+  load_balancer_arn = aws_lb.admin_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -321,8 +335,8 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.main.arn
+resource "aws_lb_listener" "https_admin" {
+  load_balancer_arn = aws_lb.admin_alb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -333,6 +347,38 @@ resource "aws_lb_listener" "https" {
     target_group_arn = aws_lb_target_group.asg1.arn
   }
 }
+
+
+resource "aws_lb_listener" "http_public" {
+  load_balancer_arn = aws_lb.public_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https_public" {
+  load_balancer_arn = aws_lb.public_alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.ssl_arn_path
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.asg2.arn
+  }
+}
+
+
 
 resource "aws_lb_target_group" "asg1" {
   name        = "asg1-tg"
@@ -365,7 +411,7 @@ resource "aws_lb_target_group" "asg2" {
 }
 
 resource "aws_lb_listener_rule" "wpadmin_rule" {
-  listener_arn = aws_lb_listener.https.arn
+  listener_arn = aws_lb_listener.https_admin.arn
   priority     = 100
 
   action {
@@ -389,7 +435,7 @@ condition {
 }
 
 resource "aws_lb_listener_rule" "default_rule" {
-  listener_arn = aws_lb_listener.https.arn
+  listener_arn = aws_lb_listener.https_public.arn
   priority     = 200
 
   action {
@@ -404,7 +450,7 @@ resource "aws_lb_listener_rule" "default_rule" {
   }
 }
 
-resource "aws_launch_configuration" "wordpress" {
+resource "aws_launch_configuration" "wordpress_admin" {
   name          = "wordpress-launch-configuration"
   image_id      = "ami-04a4792c01a4251f2" # змініть на свій AMI
   instance_type = "t2.micro"
@@ -415,22 +461,19 @@ resource "aws_launch_configuration" "wordpress" {
   }
 }
 
-locals {
-  admin_subnet_ids = concat(
-    aws_subnet.admin_subnet[*].id
-  )
+resource "aws_launch_configuration" "wordpress_public" {
+  name          = "wordpress-launch-configuration"
+  image_id      = "ami-04a4792c01a4251f2" # змініть на свій AMI
+  instance_type = "t2.micro"
+  security_groups = [aws_security_group.instance_sg.id]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
-
-locals {
-  public_subnet_ids = concat(
-    aws_subnet.public_subnet[*].id
-  )
-}
-
-
 
 resource "aws_autoscaling_group" "asg1" {
-  launch_configuration = aws_launch_configuration.wordpress.id
+  launch_configuration = aws_launch_configuration.wordpress_admin.id
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
@@ -449,7 +492,7 @@ resource "aws_autoscaling_group" "asg1" {
 }
 
 resource "aws_autoscaling_group" "asg2" {
-  launch_configuration = aws_launch_configuration.wordpress.id
+  launch_configuration = aws_launch_configuration.wordpress_public.id
   min_size             = 1
   max_size             = 3
   desired_capacity     = 1
@@ -473,8 +516,8 @@ resource "aws_route53_record" "www" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.main.dns_name
-    zone_id                = aws_lb.main.zone_id
+    name                   = aws_lb.public_alb.dns_name
+    zone_id                = aws_lb.public_alb.zone_id
     evaluate_target_health = true
   }
 }

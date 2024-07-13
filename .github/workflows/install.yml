@@ -152,10 +152,11 @@ jobs:
         run: |
           cd ${{ env.terraform-file }}
           echo "asg_name_admin_id=$(terraform output -raw asg_name_admin_id)" >> $GITHUB_ENV
-          echo "asg_name_user_id=$(terraform output -raw asg_name_user_id)" >> $GITHUB_ENV
+          echo "asg_name_public_id=$(terraform output -raw asg_name_public_id)" >> $GITHUB_ENV
           echo "listener_admin_arn=$(terraform output -raw listener_admin_arn)" >> $GITHUB_ENV
-          echo "listener_user_arn=$(terraform output -raw listener_user_arn)" >> $GITHUB_ENV
-          
+          echo "listener_public_arn=$(terraform output -raw listener_public_arn)" >> $GITHUB_ENV
+          echo "launch_configuration_public_id=$(terraform output -raw launch_configuration_public_id)" >> $GITHUB_ENV
+          echo "launch_configuration__admin_id=$(terraform output -raw launch_configuration_admin_id)" >> $GITHUB_ENV
           
       - name: Deploy to ASG_1
         env: 
@@ -165,7 +166,7 @@ jobs:
           echo $ami_name
           AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
           echo $AMI_ID
-          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name your-launch-config --image-id $AMI_ID
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }} --launch-configuration-name ${{ env.launch_configuration_admin_id }} --image-id $AMI_ID
 
       - name: Deploy to ASG_2
         env: 
@@ -173,11 +174,11 @@ jobs:
 
         run: |
           AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$ami_name" --query "Images[0].ImageId" --output text)
-          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_admin_id }}  --launch-configuration-name your-launch-config --image-id $AMI_ID
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.asg_name_public_id }}  --launch-configuration-name ${{ env.launch_configuration_public_id }} --image-id $AMI_ID
           
       - name: Wait for ASG_1 to be healthy
         run: |
-          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_admin_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
 
       - name: Switch traffic to ASG_1
         run: |
@@ -185,8 +186,8 @@ jobs:
 
       - name: Wait for ASG_2 to be healthy
         run: |
-          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_user_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
+          aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name ${{ env.asg_name_public_id }} --query "AutoScalingGroups[0].Instances[*].HealthStatus" --output text | grep -q "Healthy"
 
       - name: Switch traffic to ASG_2
         run: |
-          aws elbv2 modify-listener --listener-arn ${{ env.listener_user_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_2
+          aws elbv2 modify-listener --listener-arn ${{ env.listener_public_arn }} --default-actions Type=forward,TargetGroupArn=your-target-group-arn-asg_2

@@ -75,7 +75,7 @@ output "asg_name_admin_id" {
   value = aws_autoscaling_group.asg1.id
 }
 
-output "asg_name_user_id" {
+output "asg_name_public_id" {
   value = aws_autoscaling_group.asg2.id
 }
 
@@ -83,6 +83,14 @@ output "listener_admin_arn" {
   value = aws_lb_listener_rule.wpadmin_rule.arn
 }
 
-output "listener_user_arn" {
+output "listener_public_arn" {
   value = aws_lb_listener_rule.default_rule.arn
+}
+
+output "launch_configuration_public_id" {
+  value = aws_launch_configuration.wordpress_public
+}
+
+output "launch_configuration_public_id" {
+  value = aws_launch_configuration.wordpress_admin
 }
