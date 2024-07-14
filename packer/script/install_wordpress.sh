@@ -7,7 +7,7 @@ DB_PASSWORD=$DB_PASSWORD
 DB_HOST=$DB_HOST
 
 # Параметри WordPress
-WP_URL="https://wordpress-for-test.pp.ua"
+WP_URL="http://wordpress-for-test.pp.ua"
 WP_TITLE="My WordPress Site"
 WP_ADMIN_USER="paul"
 WP_ADMIN_PASSWORD=$DB_PASSWORD

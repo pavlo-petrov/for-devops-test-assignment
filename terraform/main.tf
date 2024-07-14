@@ -159,6 +159,15 @@ resource "aws_db_instance" "default" {
     aws_db_subnet_group.default_db
   ]
 
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [
+      allocated_storage,
+      instance_class,
+      parameter_group_name,
+    ]
+  }
+
   tags = {
     Name = "MySQL-Database"
   }
@@ -191,6 +200,17 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   port                 = 6379
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
   security_group_ids   = [aws_security_group.db.id]
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [
+      node_type,
+      number_cache_clusters,
+      parameter_group_name,
+      engine_version,
+  ]
+}
+
 }
 
 ##################### security group for parcker #################
