@@ -35,6 +35,7 @@ RUN a2enmod rewrite
 # Копіюємо файли конфігурації Apache
 COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf
 
+
 # Робочий каталог для WordPress
 WORKDIR /var/www/wordpress-for-test.pp.ua
 
@@ -47,7 +48,11 @@ RUN chown -R www-data:www-data /var/www/wordpress-for-test.pp.ua \
     && chmod -R 755 /var/www/wordpress-for-test.pp.ua \
     && chmod +x /var/www/wordpress-for-test.pp.ua/install_wordpress.sh
 
+# 
+RUN service apache2 start
+RUN a2ensite wordpress-for-test.pp.ua.conf
 
+#
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2

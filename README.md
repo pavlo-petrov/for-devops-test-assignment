@@ -1,5 +1,10 @@
 # Install WordPress
 
+Site: 
+https://wordpress-for-test.pp.ua
+or 
+http://wordpress-for-test.pp.ua
+
 ## Schema of Installation
 
 ![AWS SCHEMA](schema.drawio.png)
