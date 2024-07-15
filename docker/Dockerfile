@@ -1,14 +1,16 @@
 # Використовуємо офіційний образ PHP з Apache
-#FROM php:7.4-apache
-FROM php:8.2-cli
+# #FROM php:7.4-apache
+# FROM php:8.2-cli
+FROM ubuntu:latest
 
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
     apt install -y \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
+    apache2 \
+    libapache2-mod-php \
+    php \
+    php-mysql \
+    curl \
     unzip \
     git \
     default-mysql-client \
