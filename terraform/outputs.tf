@@ -88,11 +88,11 @@ output "listener_public_arn" {
 }
 
 output "launch_template_admin_id" {
-  value = aws_launch_template.wordpress_public.id
+  value = aws_launch_template.wordpress_admin.id
 }
 
 output "launch_template_public_id" {
-  value = aws_launch_template.wordpress_admin.id
+  value = aws_launch_template.wordpress_public.id
 }
 
 output "iam_profile_for_s3" {
