@@ -50,4 +50,4 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 80
 
 # Запуск Apache у foreground режимі
-CMD ["apache2-foreground"]
+CMD ["apachectl", "-D", "FOREGROUND"]
