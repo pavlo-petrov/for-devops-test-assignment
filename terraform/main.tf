@@ -159,14 +159,14 @@ resource "aws_db_instance" "default" {
     aws_db_subnet_group.default_db
   ]
 
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes  = [
-      allocated_storage,
-      instance_class,
-      parameter_group_name,
-    ]
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  #   ignore_changes  = [
+  #     allocated_storage,
+  #     instance_class,
+  #     parameter_group_name,
+  #   ]
+  # }
 
   tags = {
     Name = "MySQL-Database"

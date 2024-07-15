@@ -122,7 +122,7 @@ jobs:
               -var "AWS_S3_WORDPRESS_NAME_S3"=${{ env.AWS_S3_WORDPRESS_NAME_S3 }} \
               ${{ env.packer-file }}
 
-              
+###################### deploy ###################              
   deploy:
     needs: packer_build
     runs-on: ubuntu-latest
@@ -176,8 +176,8 @@ jobs:
           NEW_VERSION=$(aws ec2 create-launch-template-version \
             --launch-template-id $LAUNCH_TEMPLATE_ID \
             --source-version 1 \
-            --set-default-version
             --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
+            --set-default-version \
             --query 'LaunchTemplateVersion.VersionNumber' \
             --output text)
           
@@ -208,9 +208,8 @@ jobs:
           NEW_VERSION=$(aws ec2 create-launch-template-version \
             --launch-template-id $LAUNCH_TEMPLATE_ID \
             --source-version 1 \
-            --set-default-version
-            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
-            --query 'LaunchTemplateVersion.VersionNumber' \
+            --launch-template-data "ersion.VersionNumber' \
+            --set-default-version \
             --output text)
 
           aws autoscaling update-auto-scaling-group \
