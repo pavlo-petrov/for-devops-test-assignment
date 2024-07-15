@@ -3,6 +3,9 @@
 # FROM php:8.2-cli
 FROM wordpress:latest
 
+RUN apt update 
+RUN apt install -y sudo 
+
 # install redis... 
 # RUN pecl install redis && docker-php-ext-enable redis
 # Копіюємо файли конфігурації Apache
