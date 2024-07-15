@@ -27,9 +27,9 @@ RUN sudo chown -R www-data:www-data /var/www/.wp-cli/ \
     && chmod -R 755 /var/www/.wp-cli
 RUN chmod +x /var/www/html/install_wordpress.sh
 
-# RUN chown -R www-data:www-data /var/www/html \
-#     && chmod -R 755 /var/www/html \
-#     && chmod +x /var/www/html/install_wordpress.sh
+RUN chown -R www-data:www-data /var/www/html \
+     && chmod -R 755 /var/www/html \
+     && chmod +x /var/www/html/install_wordpress.sh
 
 # 
 RUN service apache2 start
