@@ -212,6 +212,7 @@ jobs:
             --launch-template-id $LAUNCH_TEMPLATE_ID \
             --source-version 1 \
             --launch-template-data "ersion.VersionNumber' \
+            --query 'LaunchTemplateVersion.VersionNumber' \
             --output text)
 
           aws ec2 modify-launch-template \
