@@ -26,6 +26,7 @@ RUN apt update && \
     git \
     wget \
     sudo \
+    mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Налаштування Apache
