@@ -6,6 +6,8 @@ FROM wordpress:latest
 RUN apt update 
 RUN apt install -y sudo 
 RUN apt install -y default-mysql-client
+RUN apt install -y wget
+
 
 # install redis... 
 # RUN pecl install redis && docker-php-ext-enable redis
