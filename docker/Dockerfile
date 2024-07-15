@@ -19,9 +19,12 @@ COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/w
 WORKDIR /var/www/html/
 
 # Встановлення WordPress
-COPY wordpress/. ./
+#COPY wordpress/. ./
 COPY packer/script/install_wordpress.sh ./
 
+RUN mkdir /var/www/.wp-cli
+RUN sudo chown -R www-data:www-data /var/www/.wp-cli/ \
+    && chmod -R 755 /var/www/.wp-cli
 RUN chmod +x /var/www/html/install_wordpress.sh
 
 # RUN chown -R www-data:www-data /var/www/html \
