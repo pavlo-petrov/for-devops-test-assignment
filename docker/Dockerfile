@@ -46,6 +46,12 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod +x /var/www/html/install_wordpress.sh
 
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+
+
 # Відкриття портів Apache
 EXPOSE 80
 
