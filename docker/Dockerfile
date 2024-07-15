@@ -16,6 +16,7 @@ WORKDIR /var/www/html/
 COPY wordpress/. ./
 COPY packer/script/install_wordpress.sh ./
 
+RUN chmod +x -R 775 /var/www/html/install_wordpress.sh
 
 # RUN chown -R www-data:www-data /var/www/html \
 #     && chmod -R 755 /var/www/html \
