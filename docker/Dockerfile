@@ -33,19 +33,19 @@ RUN apt update && \
 RUN a2enmod rewrite
 
 # Копіюємо файли конфігурації Apache
-# COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf
 
 # Робочий каталог для WordPress
-WORKDIR /var/www/html
+WORKDIR /var/www/wordpress-for-test.pp.ua
 
 # Встановлення WordPress
 COPY wordpress/. ./
 COPY packer/script/install_wordpress.sh ./
 
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod +x /var/www/html/install_wordpress.sh
+RUN chown -R www-data:www-data /var/www/wordpress-for-test.pp.ua \
+    && chmod -R 755 /var/www/wordpress-for-test.pp.ua \
+    && chmod +x /var/www/wordpress-for-test.pp.ua/install_wordpress.sh
 
 
 ENV APACHE_RUN_USER www-data

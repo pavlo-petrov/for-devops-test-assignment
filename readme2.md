@@ -82,19 +82,19 @@ mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 cd /tmp
 wget https://wordpress.org/latest.zip
 unzip latest.zip
-#sudo rm -rf /var/www/html/*
-sudo mv wordpress /var/www/html/wordpress/
+#sudo rm -rf /var/www/wordpress-for-test.pp.ua/*
+sudo mv wordpress /var/www/wordpress-for-test.pp.ua/wordpress/
 
 # Налаштування прав доступу
-sudo chown -R www-data:www-data /var/www/html/wordpress/
-sudo chmod -R 755 /var/www/html/wordpress/
+sudo chown -R www-data:www-data /var/www/wordpress-for-test.pp.ua/wordpress/
+sudo chmod -R 755 /var/www/wordpress-for-test.pp.ua/wordpress/
 
 # Створення файлу wp-config.php
-cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/username_here/${DB_USER}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/password_here/${DB_PASSWORD}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/localhost/${DB_HOST}/" /var/www/html/wordpress/wp-config.php
+cp /var/www/wordpress-for-test.pp.ua/wordpress/wp-config-sample.php /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/username_here/${DB_USER}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/password_here/${DB_PASSWORD}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/localhost/${DB_HOST}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
 
 # Перевірка ��'єднання з базою даних
 
@@ -119,18 +119,18 @@ sudo a2enmod rewrite
 sudo service apache2 restart
 
 # Автоматичне встановлення WordPress через WP-CLI
-cd /var/www/html/wordpress/
+cd /var/www/wordpress-for-test.pp.ua/wordpress/
 wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 sudo mv wp-cli.phar /usr/local/bin/wp
 
 
 
-if sudo -u www-data wp core is-installed --path=/var/www/html/wordpress/; then
+if sudo -u www-data wp core is-installed --path=/var/www/wordpress-for-test.pp.ua/wordpress/; then
   echo "WordPress вже встановлений. Пропускаємо установку."
 else
   # Виконання установки WordPress
-  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html/wordpress
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/wordpress-for-test.pp.ua/wordpress
   echo "WordPress успішно встановлено!"
 fi
 
@@ -197,12 +197,12 @@ mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 echo "!!!!!!user added or exist!!!!!!"
 
 # Створення файлу wp-config.php, якщо він не існує
-if [ ! -f /var/www/html/wp-config.php ]; then
-    cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-    sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
-    sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
-    sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
-    sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
+if [ ! -f /var/www/wordpress-for-test.pp.ua/wp-config.php ]; then
+    cp /var/www/wordpress-for-test.pp.ua/wp-config-sample.php /var/www/wordpress-for-test.pp.ua/wp-config.php
+    sed -i "s/database_name_here/${DB_NAME}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
+    sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
+    sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
+    sed -i "s/localhost/${DB_HOST}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
     echo "!!!!!!copied and setuped!!!!!!"
 else
     echo "Файл wp-config.php вже існує."
@@ -231,20 +231,20 @@ apachectl graceful
 echo "!!!!!! apache restarted correct !!!!!!"
 
 # Автоматичне встановлення WordPress через WP-CLI
-cd /var/www/html/
+cd /var/www/wordpress-for-test.pp.ua/
 wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
 echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
 
-if sudo -u www-data wp core is-installed --path=/var/www/html/; then
+if sudo -u www-data wp core is-installed --path=/var/www/wordpress-for-test.pp.ua/; then
   echo "WordPress вже встановлений. Пропускаємо установку."
 else
   # Виконання установки WordPress
-  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/wordpress-for-test.pp.ua
   sudo -u www-data wp plugin install redis-cache --activate
-  WP_CONFIG_PATH="/var/www/html/wp-config.php"
+  WP_CONFIG_PATH="/var/www/wordpress-for-test.pp.ua/wp-config.php"
   if ! grep -q "WP_REDIS_HOST" "$WP_CONFIG_PATH"; then
     echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
     echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
@@ -256,13 +256,13 @@ fi
 
 # Встановлення та налаштування плагіну для S3
 PLUGIN_SLUG="amazon-s3-and-cloudfront"
-if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html/; then
-  sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
+if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/wordpress-for-test.pp.ua/; then
+  sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/wordpress-for-test.pp.ua/
   # Налаштування плагіну можна додати сюди, наприклад:
-  # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","access-key-id":"YOUR_ACCESS_KEY","secret-access-key":"YOUR_SECRET_KEY","bucket":"YOUR_BUCKET_NAME","region":"YOUR_REGION"}' --type=json --path=/var/www/html/
+  # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","access-key-id":"YOUR_ACCESS_KEY","secret-access-key":"YOUR_SECRET_KEY","bucket":"YOUR_BUCKET_NAME","region":"YOUR_REGION"}' --type=json --path=/var/www/wordpress-for-test.pp.ua/
 else
   echo "Плагін ${PLUGIN_SLUG} вже встановлений."
-  sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
+  sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/wordpress-for-test.pp.ua/
 fi
 
 

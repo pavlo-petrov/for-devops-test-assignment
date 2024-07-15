@@ -40,19 +40,19 @@ mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 cd /tmp
 wget https://wordpress.org/latest.zip
 unzip latest.zip
-#sudo rm -rf /var/www/html/*
-sudo mv wordpress /var/www/html/wordpress/
+#sudo rm -rf /var/www/wordpress-for-test.pp.ua/*
+sudo mv wordpress /var/www/wordpress-for-test.pp.ua/wordpress/
 
 # Налаштування прав доступу
-sudo chown -R www-data:www-data /var/www/html/wordpress/
-sudo chmod -R 755 /var/www/html/wordpress/
+sudo chown -R www-data:www-data /var/www/wordpress-for-test.pp.ua/wordpress/
+sudo chmod -R 755 /var/www/wordpress-for-test.pp.ua/wordpress/
 
 # Створення файлу wp-config.php
-cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/username_here/${DB_USER}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/password_here/${DB_PASSWORD}/" /var/www/html/wordpress/wp-config.php
-sudo sed -i "s/localhost/${DB_HOST}/" /var/www/html/wordpress/wp-config.php
+cp /var/www/wordpress-for-test.pp.ua/wordpress/wp-config-sample.php /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/username_here/${DB_USER}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/password_here/${DB_PASSWORD}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
+sudo sed -i "s/localhost/${DB_HOST}/" /var/www/wordpress-for-test.pp.ua/wordpress/wp-config.php
 
 # Перевірка ��'єднання з базою даних
 
@@ -77,17 +77,17 @@ sudo a2enmod rewrite
 sudo service apache2 restart
 
 # Автоматичне встановлення WordPress через WP-CLI
-cd /var/www/html/wordpress/
+cd /var/www/wordpress-for-test.pp.ua/wordpress/
 wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 sudo mv wp-cli.phar /usr/local/bin/wp
 
 
 
-if sudo -u www-data wp core is-installed --path=/var/www/html/wordpress/; then
+if sudo -u www-data wp core is-installed --path=/var/www/wordpress-for-test.pp.ua/wordpress/; then
   echo "WordPress вже встановлений. Пропускаємо установку."
 else
   # Виконання установки WordPress
-  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html/wordpress
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/wordpress-for-test.pp.ua/wordpress
   echo "WordPress успішно встановлено!"
 fi
