@@ -1,132 +1,285 @@
-# Install WordPress
+Create manual 
+(click-on with using AWS WEB UI)
 
-## Schema of Installation
+1. s3 bucket for terraform state.
+(do not forget ot activate "version" and "encrypt" like me)
 
----
+2. secret manager: 
+- add MySQL admin's password: 
+	- secret name: test_mysql_pass
+	- Secret key: password_for_mysql
 
-## Part #1: Manual Setup
+3. open github repozitory and add: 
+    - credential for aws: 
+        AWS_ACCESS_KEY
+        AWS_SECRET_ACCESS_KEY
 
-### Step 1.1: Create AWS Account
-- Sign up for an AWS account if you don't have one.
+4. Create two accounts on Docker Hub:
+    - for admin contaner 
+    - for work contaner
 
-### Step 1.2: Create S3 Bucket for Terraform State
-- Create an S3 bucket to store your Terraform state.
-- Consider using DynamoDB for state locking to prevent concurrent Terraform executions (this will be addressed later).
-
-### Step 1.3: Setup Secrets in GitHub
-- Add AWS credentials to GitHub Secrets for secure access.
-
-### Step 1.4: Configure AWS Credentials
-- Use the AWS Console to set up credentials for:
-  - Docker Hub
-  - Database and wp-admin (remember to configure usernames for the database and WordPress later).
-
-### Step 1.5: Create SSH Key for EC2 Instance
-- Generate an SSH key for your EC2 instance.
-- (Note: It’s recommended to use Terraform for this, but you can skip regeneration if you already have a key.)
-
----
-
-## Part #2: Terraform
-
-1. Run the following commands:
-   ```bash
-   terraform init
-   terraform apply
+5. Create your domain and use amazon's NS servers for this. 
 
 
+database-1 
+admin
 
-## Part #3: CI/CD
 
-### Step 3.1: Create Docker Container
-- **Objective**: Build a Docker container with the WordPress source code.
-- **Action**:
-  - Push the Docker container to Docker Hub.
-- **Benefits**:
-  - Isolation of the site.
-  - Facilitates future migrations.
+Pq$oy1Jejz&enk@d3q
 
-### Step 3.2: Create AMI Image
-- **Source**: Utilize `blank-wordpress-code` from a GitHub repository (unzip the archive from WordPress.org).
-- **Note**: WordPress requires database connections (MySQL and Redis) to function properly when deployed within AWS.
-
-#### Use the Installation Script
-- **Script Path**: `/packer/scripts/install_wordpress.md`
-- **Installation Tasks**:
-  - Set up the database.
-  - Set up Redis.
-  - Set up HTTPS plugin (currently not functional; ongoing work).
-  - Set up S3 (to be addressed within 1-2 days).
-
-> **Note**: We can use the source code with installed plugins, but the functionality without prior setup is uncertain.
-
-### Step 3.3: Deployment
-- **Objective**: Implement green/blue deployment strategy.
-- **Action**: Switch running instances in the Auto Scaling Group (ASG) to ensure zero downtime during updates.
+aws 
+AKIA6GBMGM3JJOOUCV4C
 
 
 
 
+4.
+5.
+6.
+7.
+8.
 
-Install wordpress
+ubuntu@ip-10-0-1-105:~$ cat ./install-wordpress.sh 
+#!/bin/bash
 
-Schema of installation
+# parametrs of MySQL
+DB_NAME="wordpress_db"
+DB_USER="admin"
+DB_PASSWORD="ASDcsxcfsdfSDFSDF123123asdsadasd"
+DB_HOST="my-mysql-db.czc486e46x94.eu-west-1.rds.amazonaws.com"
+
+# Параметри WordPress
+WP_URL="http://wordpress-for-test.pp.ua"
+WP_TITLE="My WordPress Site"
+WP_ADMIN_USER="paul"
+WP_ADMIN_PASSWORD="ASDcsxcfsdfSDFSDF123123asdsadasd"
+WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
+
+# Оновлення та встановлення необхідних пакетів
+sudo apt update
+sudo apt install -y apache2 mysql-server php php-mysql libapache2-mod-php wget unzip
+
+# Створення бази даних та користувача MySQL
+DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+if [ -z "$DB_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+else
+    echo "База даних ${DB_NAME} вже існує."
+fi
+
+USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
+if [ -z "$USER_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+else
+    echo "Користувач ${DB_USER}@${DB_HOST} вже існує."
+fi
+
+mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
+
+
+# Завантаження та розпаковування WordPress
+cd /tmp
+wget https://wordpress.org/latest.zip
+unzip latest.zip
+#sudo rm -rf /var/www/html/*
+sudo mv wordpress /var/www/html/wordpress/
+
+# Налаштування прав доступу
+sudo chown -R www-data:www-data /var/www/html/wordpress/
+sudo chmod -R 755 /var/www/html/wordpress/
+
+# Створення файлу wp-config.php
+cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wordpress/wp-config.php
+sudo sed -i "s/username_here/${DB_USER}/" /var/www/html/wordpress/wp-config.php
+sudo sed -i "s/password_here/${DB_PASSWORD}/" /var/www/html/wordpress/wp-config.php
+sudo sed -i "s/localhost/${DB_HOST}/" /var/www/html/wordpress/wp-config.php
+
+# Перевірка ��'єднання з базою даних
+
+sudo -u www-data php -r "
+\$mysqli = new mysqli('${DB_HOST}', '${DB_USER}', '${DB_PASSWORD}', '${DB_NAME}');
+if (\$mysqli->connect_error) {
+    die('Connection failed: ' . \$mysqli->connect_error);
+} else {
+    echo 'Connection successful to database server.';
+}
+if (!\$mysqli->select_db('${DB_NAME}')) {
+    die('Cannot select database: ' . \$mysqli->error);
+} else {
+    echo 'Database ${DB_NAME} selected successfully.';
+}
+"
+
+
+
+# Налаштування Apache
+sudo a2enmod rewrite
+sudo service apache2 restart
+
+# Автоматичне встановлення WordPress через WP-CLI
+cd /var/www/html/wordpress/
+wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+sudo mv wp-cli.phar /usr/local/bin/wp
+
+
+
+if sudo -u www-data wp core is-installed --path=/var/www/html/wordpress/; then
+  echo "WordPress вже встановлений. Пропускаємо установку."
+else
+  # Виконання установки WordPress
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html/wordpress
+  echo "WordPress успішно встановлено!"
+fi
+
+
+ubuntu@ip-10-0-1-105:~$ 
 
 
 
 
- 
-Part #1. Manuel setup
+variable "docker_hub_username" {}
+variable "docker_hub_access_token" {}
 
-step 1.1
-Create AWS account 
-
-Step 1.2.
-Create S3 bucket for terraform state
-(we need to use some database like dynamodb for protacted of using two teraform at one time .. but not realise this )
-
-Step 1.3 
-Setup secrets in github and add AWS credential 
-
-Step 1.4. 
-Use AWS consule and setup credential for:
-- docker hub;
-- daatabase/wp-admin; ( i know we need to setup here usernames for db and wordpress .. but maybe in other time )
-
-Step 1.3. 
-Create ssh-key for ec2 instance 
-(i know we need to use terraform for this - but i had it and don't want to change every time whan i need to run terraform destroy.. )
+  environment_vars = [
+      "DOCKER_HUB_USERNAME=${var.docker_hub_username}",
+      "DOCKER_HUB_ACCESS_TOKEN=${var.docker_hub_access_token}"
+  ]
 
 
-Part #2. Terraform 
-terraform init 
-terraform apply 
 
-(I don't know how to run terraform in CI/CD (do you remember - im only junior) - because this we need to run on your/my local machine.)
+#!/bin/bash
 
-Part #3. CI/CD
+# параметри MySQL
+DB_NAME="wordpress_db"
+DB_USER="admin"
+DB_PASSWORD=$DB_PASSWORD
+DB_HOST=$DB_HOST
 
-Step 3.1 
-Create a docker container with wordpress's source code and push it to dockerhub.
-We need use docker for isolate our site. it gives to us better migration in future. 
+# Параметри WordPress
+WP_URL="https://wordpress-for-test.pp.ua"
+WP_TITLE="My WordPress Site"
+WP_ADMIN_USER="paul"
+WP_ADMIN_PASSWORD=$DB_PASSWORD
+WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
 
-Step 3.2
-Create ami image. 
+# Встановлення Redis
+if ! command -v redis-server &> /dev/null; then
+  echo "Redis не встановлений. Встановлюємо Redis..."
+  apt-get update
+  apt-get install -y redis-server
+  systemctl enable redis-server
+  systemctl start redis-server
+else
+  echo "Redis вже встановлений."
+fi
 
-I used blank-wordpress-code in github repository (only unzip archive from wordpress.org) 
-I don't know how wordpress will works if we setup it untile ci/cd - because it will work without connection to databases: mysql and redis... Because this we need to run inside AWS. 
-Inside work subnet. 
+# Перевірка наявності бази даних та користувача
+DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+if [ -z "$DB_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+else
+    echo "База даних ${DB_NAME} вже існує."
+fi
 
-For this we use script: /packer/scripts/install_wordpress.md
-(I needed to ask developers for this.. but i hadn't one whan i started word on this test)
+USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${WP_ADMIN_USER}' AND host = '%';" | grep "1")
+if [ -z "$USER_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
+else
+    echo "Користувач ${WP_ADMIN_USER}@% вже існує."
+fi
 
-Use instalation script for install wordpress:
-- setup database
-- setup redis
-- setup https plugin (no-realise - HTTPS doesn't word correct for now. im working on this)
-- setup S3 (no-realise for now .. maybe untile 1-2 days)
-(i know we can use source code with installed plug-ins and but i don't how i will word if we didn't setup it in )
+mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 
-Step 3.3.
-Deploy 
-We need to use green/blue deploy for change our running instances in ASG.
+echo "!!!!!!user added or exist!!!!!!"
+
+# Створення файлу wp-config.php, якщо він не існує
+if [ ! -f /var/www/html/wp-config.php ]; then
+    cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+    sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
+    sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
+    sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
+    sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
+    echo "!!!!!!copied and setuped!!!!!!"
+else
+    echo "Файл wp-config.php вже існує."
+fi
+
+# Перевірка з'єднання з базою даних
+php -r "
+\$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_PASSWORD}', '${DB_NAME}');
+if (\$mysqli->connect_error) {
+    die('Connection failed: ' . \$mysqli->connect_error);
+} else {
+    echo 'Connection successful to database server.';
+}
+if (!\$mysqli->select_db('${DB_NAME}')) {
+    die('Cannot select database: ' . \$mysqli->error);
+} else {
+    echo 'Database ${DB_NAME} selected successfully.';
+}
+"
+
+echo "!!!!!!!!connection with db exist!!!!!!"
+
+# Налаштування Apache
+a2enmod rewrite
+apachectl graceful
+echo "!!!!!! apache restarted correct !!!!!!"
+
+# Автоматичне встановлення WordPress через WP-CLI
+cd /var/www/html/
+wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
+
+echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
+
+if sudo -u www-data wp core is-installed --path=/var/www/html/; then
+  echo "WordPress вже встановлений. Пропускаємо установку."
+else
+  # Виконання установки WordPress
+  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
+  sudo -u www-data wp plugin install redis-cache --activate
+  WP_CONFIG_PATH="/var/www/html/wp-config.php"
+  if ! grep -q "WP_REDIS_HOST" "$WP_CONFIG_PATH"; then
+    echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
+    echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
+    echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
+  fi
+  wp redis enable
+  echo "WordPress успішно встановлено!"
+fi
+
+# Встановлення та налаштування плагіну для S3
+PLUGIN_SLUG="amazon-s3-and-cloudfront"
+if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html/; then
+  sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
+  # Налаштування плагіну можна додати сюди, наприклад:
+  # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","access-key-id":"YOUR_ACCESS_KEY","secret-access-key":"YOUR_SECRET_KEY","bucket":"YOUR_BUCKET_NAME","region":"YOUR_REGION"}' --type=json --path=/var/www/html/
+else
+  echo "Плагін ${PLUGIN_SLUG} вже встановлений."
+  sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
+fi
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListObjectsInBucket",
+            "Effect": "Allow",
+            "Action": ["s3:ListBucket"],
+            "Resource": ["arn:aws:s3:::bucket-name"]
+        },
+        {
+            "Sid": "AllObjectActions",
+            "Effect": "Allow",
+            "Action": "s3:*Object",
+            "Resource": ["arn:aws:s3:::bucket-name/*"]
+        }
+    ]
+}

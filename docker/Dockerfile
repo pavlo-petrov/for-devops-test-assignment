@@ -1,5 +1,6 @@
 # Використовуємо офіційний образ PHP з Apache
-FROM php:7.4-apache
+#FROM php:7.4-apache
+FROM php:8.2-cli
 
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
