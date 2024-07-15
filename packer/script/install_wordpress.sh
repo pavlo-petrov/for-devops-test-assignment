@@ -41,11 +41,11 @@ mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 echo "!!!!!!user added or exist!!!!!!"
 
 # Створення файлу wp-config.php
-sudo -u www-data cp /var/www/wordpress-for-test.pp.ua/wp-config-sample.php /var/www/wordpress-for-test.pp.ua/wp-config.php
-sed -i "s/database_name_here/${DB_NAME}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
-sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
-sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
-sed -i "s/localhost/${DB_HOST}/" /var/www/wordpress-for-test.pp.ua/wp-config.php
+sudo -u www-data cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
+sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
+sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
+sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 
 echo "!!!!!!copied add setuped!!!!!!"
 
@@ -72,7 +72,7 @@ apachectl graceful
 echo "!!!!!! apache restarted correct !!!!!!"
 
 # Автоматичне встановлення WordPress через WP-CLI
-cd /var/www/wordpress-for-test.pp.ua/
+cd /var/www/html/
 wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
@@ -80,9 +80,9 @@ mv wp-cli.phar /usr/local/bin/wp
 echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
 
 # Виконання установки WordPress
-sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/wordpress-for-test.pp.ua
+sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
 sudo -u www-data wp plugin install redis-cache --activate
-WP_CONFIG_PATH="/var/www/wordpress-for-test.pp.ua/wp-config.php"
+WP_CONFIG_PATH="/var/www/html/wp-config.php"
 
 # install redis 
 echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
@@ -96,6 +96,6 @@ echo "WordPress install or not - but we are in this step!"
 
 # Встановлення та налаштування плагіну для S3
 PLUGIN_SLUG="amazon-s3-and-cloudfront"
-sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/wordpress-for-test.pp.ua/
-sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/wordpress-for-test.pp.ua/
-sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/wordpress-for-test.pp.ua/
+sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
+sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
+sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/html/

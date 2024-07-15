@@ -1,7 +1,7 @@
 # Використовуємо офіційний образ PHP з Apache
 # #FROM php:7.4-apache
 # FROM php:8.2-cli
-FROM ubuntu:latest
+FROM wordpress:latest
 
 # Оновлення та встановлення необхідних пакетів
 RUN apt update && \
@@ -37,16 +37,16 @@ COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/w
 
 
 # Робочий каталог для WordPress
-WORKDIR /var/www/wordpress-for-test.pp.ua
+WORKDIR /var/www/html/
 
 # Встановлення WordPress
 COPY wordpress/. ./
 COPY packer/script/install_wordpress.sh ./
 
 
-RUN chown -R www-data:www-data /var/www/wordpress-for-test.pp.ua \
-    && chmod -R 755 /var/www/wordpress-for-test.pp.ua \
-    && chmod +x /var/www/wordpress-for-test.pp.ua/install_wordpress.sh
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod +x /var/www/html/install_wordpress.sh
 
 # 
 RUN service apache2 start
