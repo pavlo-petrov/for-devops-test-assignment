@@ -132,7 +132,7 @@ sudo docker exec \
 -e AWS_S3_WORDPRESS_NAME_S3 \
 -e AWS_REGION \
 my-container /bin/bash -c '
-/var/www/html/install_wordpress.sh
+sudo /var/www/html/install_wordpress.sh
 '
 HEREDOC
     ,

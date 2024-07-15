@@ -46,6 +46,9 @@ sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
 sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
 sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
+echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
+echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
+echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
 
 echo "!!!!!!copied add setuped!!!!!!"
 
@@ -85,9 +88,9 @@ sudo -u www-data wp plugin install redis-cache --activate
 WP_CONFIG_PATH="/var/www/html/wp-config.php"
 
 # install redis 
-echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
-echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
-echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
+#echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
+#echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
+#echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
 sudo -u www-data wp config set WP_REDIS_DATABASE "15"
 sudo -u www-data wp redis enable
 sudo -u www-data wp redis status
