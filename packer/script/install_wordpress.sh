@@ -79,31 +79,23 @@ mv wp-cli.phar /usr/local/bin/wp
 
 echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
 
-if sudo -u www-data wp core is-installed --path=/var/www/html/; then
-  echo "WordPress вже встановлений. Пропускаємо установку."
-else
-  # Виконання установки WordPress
-  sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
-  sudo -u www-data wp plugin install redis-cache --activate
-  WP_CONFIG_PATH="/var/www/html/wp-config.php"
-if ! grep -q "WP_REDIS_HOST" "$WP_CONFIG_PATH"; then
-  echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
-  echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
-  echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
-fi
-  wp redis enable
-  echo "WordPress успішно встановлено!"
-fi
+# Виконання установки WordPress
+sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html
+sudo -u www-data wp plugin install redis-cache --activate
+WP_CONFIG_PATH="/var/www/html/wp-config.php"
+
+# install redis 
+echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
+echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
+echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
+sudo -u www-data wp config set WP_REDIS_DATABASE "15"
+sudo -u www-data wp redis enable
+sudo -u www-data wp redis status
+
+echo "WordPress install or not - but we are in this step!"
 
 # Встановлення та налаштування плагіну для S3
 PLUGIN_SLUG="amazon-s3-and-cloudfront"
-if ! sudo -u www-data wp plugin is-installed ${PLUGIN_SLUG} --path=/var/www/html/; then
-  sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
-  # Налаштування плагіну можна додати сюди, наприклад:
-  # sudo -u www-data wp config set AS3CF_SETTINGS --add='{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}' --type=json --path=/var/www/html/
-  #  sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
-  sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/html/
-else
-  echo "Плагін ${PLUGIN_SLUG} вже встановлений."
-  sudo -u www-data wp plugin activate ${PLUGIN_SLUG} --path=/var/www/html/
-fi
+sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
+sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
+sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/html/
