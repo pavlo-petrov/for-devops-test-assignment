@@ -7,23 +7,26 @@ FROM ubuntu:latest
 RUN apt update && \
     apt install -y \
     apache2 \
-    libapache2-mod-php \
     php \
-    php-mysql \
+    php-cli \
+    php-common \
+    php-imap \
+    php-fpm \
+    php-snmp \
+    php-xml \
+    php-zip \
+    php-mbstring \
+    php-curl \
+    php-mysqli \
+    php-gd \
+    php-intl \
+    php-redis \
     curl \
     unzip \
     git \
-    default-mysql-client \
     wget \
     sudo \
     && rm -rf /var/lib/apt/lists/*
-
-# Встановлення Redis cli
-RUN pecl install redis && docker-php-ext-enable redis
-
-# Налаштування PHP розширень
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd mysqli zip
 
 # Налаштування Apache
 RUN a2enmod rewrite
