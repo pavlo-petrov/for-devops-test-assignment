@@ -67,9 +67,11 @@ resource "null_resource" "provision_mysql" {
       "echo host=${local.db_endpoint_host} >> ~/my.cng",
       "mysql --defaults-extra-file=~/my.cng -e 'CREATE DATABASE IF NOT EXISTS ${var.db_name};'",
       "echo line1 > ~/my.test",
-      "mysql --defaults-extra-file=~/my.cng -e \"CREATE USER '${var.user_mark}'@'%' IDENTIFIED BY '${local.db_password}'; GRANT ALL PRIVILEGES ON ${var.db_name}.* TO '${var.user_mark}'@'%';\"",
+      "mysql --defaults-extra-file=~/my.cng -e \"CREATE USER '${var.user_mark}'@'%' IDENTIFIED BY '${local.db_password}';\"",
+      "mysql --defaults-extra-file=~/my.cng -e \"GRANT ALL PRIVILEGES ON ${var.db_name}.* TO '${var.user_mark}'@'%';\"",
       "echo line2 >> ~/my.test",
-      "mysql --defaults-extra-file=~/my.cng -e \"CREATE USER '${var.user_paul}'@'%' IDENTIFIED BY '${local.db_password}'; GRANT ALL PRIVILEGES ON ${var.db_name}.* TO '${var.user_paul}'@'%';\"",
+      "mysql --defaults-extra-file=~/my.cng -e \"CREATE USER '${var.user_paul}'@'%' IDENTIFIED BY '${local.db_password}';\"",
+      "mysql --defaults-extra-file=~/my.cng -e \"GRANT ALL PRIVILEGES ON ${var.db_name}.* TO '${var.user_paul}'@'%';\"",
       "echo line3 >> ~/my.test"
     ]
   }
