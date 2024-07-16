@@ -26,6 +26,7 @@ COPY packer/script/install_wordpress.sh ./
 
 RUN wget https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip
 RUN unzip redis-cache.latest-stable.zip -d /var/www/html/wp-content/plugins/
+RUN mkdir -p /var/www/html/wp-content/plugins
 RUN chown -R www-data:www-data /var/www/html \
      && chmod -R 755 /var/www/html \
      && chmod +x /var/www/html/install_wordpress.sh
