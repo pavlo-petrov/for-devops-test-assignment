@@ -37,6 +37,17 @@ EOF
 
 echo "EOF"
 
+cat /var/www/html/my.cnf
+
+DB_EXISTS=$(mysql --defaults-extra-file=~/.my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
+echo "DB_EXISTS = $DB_EXISTS ${DB_EXISTS}"
+ if [ -z "$DB_EXISTS" ]; then
+     mysql --defaults-extra-file=~/.my.cnf -e "CREATE DATABASE '${DB_NAME}';"
+ else
+     echo "База даних ${DB_NAME} вже існує."
+ fi
+
+
 
 DB_EXISTS=$(mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 echo "DB_EXISTS = $DB_EXISTS ${DB_EXISTS}"
