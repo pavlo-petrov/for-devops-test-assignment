@@ -28,6 +28,13 @@ MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 #     echo "База даних ${DB_NAME} вже існує."
 # fi
 
+# Перевірка наявності необхідних змінних оточення
+if [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
+    echo "Помилка: Потрібно встановити змінні оточення DB_HOST, DB_USER, DB_PASSWORD, DB_NAME."
+    exit 1
+fi
+
+
 echo "create database" 
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 echo "db_exists setted" 
