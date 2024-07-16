@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-zip
 RUN apt install -y php-intl 
 RUN apt install -y wget unzip 
-RUN apt install -y php-pear php-dev
+RUN apt install -y php-pear php-dev 
 RUN (echo "no" | sudo pecl install redis) || true
 RUN echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')/apache2/conf.d/20-redis.ini
 
@@ -38,7 +38,7 @@ RUN echo "mysql install finished"
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x /var/www/html/wp-cli.phar
 RUN mv /var/www/html/wp-cli.phar /usr/local/bin/wp
-     
+RUN apt install -y sudo
 
 
 # Відкриття портів Apache
