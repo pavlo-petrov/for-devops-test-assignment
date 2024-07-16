@@ -298,13 +298,13 @@ resource "aws_lb" "admin_alb" {
   subnets            = local.admin_subnet_ids
 }
 
-resource "aws_lb" "public_alb" {
-  name               = "load-balancer-public"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = local.public_subnet_ids
-}
+# resource "aws_lb" "public_alb" {
+#   name               = "load-balancer-public"
+#   internal           = false
+#   load_balancer_type = "application"
+#   security_groups    = [aws_security_group.alb_sg.id]
+#   subnets            = local.public_subnet_ids
+# }
 
 resource "aws_lb_listener" "http_admin" {
   load_balancer_arn = aws_lb.admin_alb.arn
@@ -336,34 +336,34 @@ resource "aws_lb_listener" "https_admin" {
 }
 
 
-resource "aws_lb_listener" "http_public" {
-  load_balancer_arn = aws_lb.public_alb.arn
-  port              = "80"
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "http_public" {
+#   load_balancer_arn = aws_lb.public_alb.arn
+#   port              = "80"
+#   protocol          = "HTTP"
 
-  default_action {
-    type = "redirect"
+#   default_action {
+#     type = "redirect"
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
 
-resource "aws_lb_listener" "https_public" {
-  load_balancer_arn = aws_lb.public_alb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.ssl_arn_path
+# resource "aws_lb_listener" "https_public" {
+#   load_balancer_arn = aws_lb.public_alb.arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+#   certificate_arn   = var.ssl_arn_path
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.asg2.arn
-  }
-}
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.asg2.arn
+#   }
+# }
 
 
 
@@ -411,23 +411,21 @@ resource "aws_lb_listener_rule" "wpadmin_rule" {
     target_group_arn = aws_lb_target_group.asg1.arn
   }
 
-
-condition {
+  condition {
     host_header {
       values = [var.hosted_zone_name]
     }
   }
 
-condition {
+  condition {
     path_pattern {
       values = ["/wp-admin/*"]
     }
   }
-
 }
 
 resource "aws_lb_listener_rule" "default_rule" {
-  listener_arn = aws_lb_listener.https_public.arn
+  listener_arn = aws_lb_listener.https_admin.arn
   priority     = 200
 
   action {
@@ -437,10 +435,33 @@ resource "aws_lb_listener_rule" "default_rule" {
 
   condition {
     host_header {
-      values = [ var.hosted_zone_name ]
+      values = [var.hosted_zone_name]
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]
     }
   }
 }
+
+
+# resource "aws_lb_listener_rule" "default_rule" {
+#   listener_arn = aws_lb_listener.https_public.arn
+#   priority     = 200
+
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.asg2.arn
+#   }
+
+#   condition {
+#     host_header {
+#       values = [ var.hosted_zone_name ]
+#     }
+#   }
+# }
 
 resource "aws_launch_template" "wordpress_admin" {
   name          = "wordpress-launch-template-admin"
@@ -512,8 +533,8 @@ resource "aws_autoscaling_group" "asg2" {
     id = aws_launch_template.wordpress_public.id
     version = "$Latest"
   } 
-  min_size             = 1
-  max_size             = 3
+  min_size             = 3
+  max_size             = 4
   desired_capacity     = 1
   vpc_zone_identifier  = local.public_subnet_ids
 
