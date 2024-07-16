@@ -191,3 +191,5 @@ PLUGIN_SLUG="amazon-s3-and-cloudfront"
 sudo -u www-data wp plugin install ${PLUGIN_SLUG} --activate --path=/var/www/html/
 sudo -u www-data wp config set AS3CF_SETTINGS --add="{\"provider\":\"aws\",\"bucket\":\"${MY_S3}\",\"region\":\"${MY_REGION}\"}" --type=json --path=/var/www/html/
 sudo -u www-data wp config set AS3CF_SETTINGS "{"provider":"aws","bucket":"$MY_S3","region":"$MY_REGION"}" --add=true --type=constant --path=/var/www/html/
+
+rm /var/www/html/install_wordpress.sh

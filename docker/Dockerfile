@@ -39,6 +39,8 @@ RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.ph
 RUN chmod +x /var/www/html/wp-cli.phar
 RUN mv /var/www/html/wp-cli.phar /usr/local/bin/wp
 RUN apt install -y sudo
+RUN rm /var/www/html/index.html
+RUN rm /var/www/html/redis-cache.latest-stable.zip
 
 
 # Відкриття портів Apache
