@@ -154,8 +154,8 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
 echo "!!!!!!!!connection with db exist or not!!!!!!"
 
 # Налаштування Apache
-a2enmod rewrite
-apachectl graceful
+#a2enmod rewrite
+#apachectl graceful
 echo "!!!!!! apache restarted correct !!!!!!"
 
 # Автоматичне встановлення WordPress через WP-CLI
