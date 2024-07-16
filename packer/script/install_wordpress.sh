@@ -28,7 +28,7 @@ echo "DB_HOST: $DB_HOST"
 echo "DB_USER: $DB_USER"
 
 
-cat << EOF > ~/my.cnf
+cat << EOF > ./my.cnf
 [client]
 user=${DB_USER}
 password=${DB_PASSWORD}
@@ -38,10 +38,10 @@ EOF
 echo "EOF"
 
 
-DB_EXISTS=$(mysql --defaults-extra-file=/tmp/my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
+DB_EXISTS=$(mysql --defaults-extra-file=./my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 echo "DB_EXISTS = $DB_EXISTS ${DB_EXISTS}"
  if [ -z "$DB_EXISTS" ]; then
-     mysql --defaults-extra-file=/tmp/my.cnf -e "CREATE DATABASE '${DB_NAME}';"
+     mysql --defaults-extra-file=./my.cnf -e "CREATE DATABASE '${DB_NAME}';"
  else
      echo "База даних ${DB_NAME} вже існує."
  fi
@@ -106,19 +106,19 @@ echo "database created or not"
 # mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
 
 # Перевірка чи існує користувач MySQL
-USER_EXISTS=$(mysql --defaults-extra-file=~/.my.cnf --silent --skip-column-names --batch -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
+USER_EXISTS=$(mysql --defaults-extra-file=~./my.cnf --silent --skip-column-names --batch -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
 if [ -z "${USER_EXISTS}" ]; then
-    mysql --defaults-extra-file=~/.my.cnf --silent --skip-column-names --batch -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
-    mysql --defaults-extra-file=~/.my.cnf --silent --skip-column-names --batch -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
+    mysql --defaults-extra-file=./my.cnf --silent --skip-column-names --batch -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
+    mysql --defaults-extra-file=./my.cnf --silent --skip-column-names --batch -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
 else
     echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
 fi
 
 # Оновлення привілеїв MySQL
-mysql --defaults-extra-file=~/.my.cnf --silent --skip-column-names --batch -e "FLUSH PRIVILEGES;"
+mysql --defaults-extra-file=./my.cnf --silent --skip-column-names --batch -e "FLUSH PRIVILEGES;"
 
 
- rm -f ~/my.cnf
+ rm -f ./my.cnf
  echo "rm /tmp/my.cnf" 
 
 echo "!!!!!!user added or exist!!!!!!"
