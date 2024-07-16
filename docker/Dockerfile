@@ -5,6 +5,7 @@
 FROM ubuntu:latest
 
 RUN apt update 
+RUN apt install -y unzip
 RUN apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip wget unzip mysql-client php-pear php-dev
 RUN (echo "no" | sudo pecl install redis) || true
 RUN echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')/apache2/conf.d/20-redis.ini
