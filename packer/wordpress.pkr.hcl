@@ -105,7 +105,7 @@ provisioner "shell" {
   inline = [
     "sudo apt clean",
     "sudo rm -rf /var/lib/apt/lists/*",
-    "sudo apt update -y",
+    "sudo apt update",
     "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg",
     "sudo install -m 0755 -d /etc/apt/keyrings",
     "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
