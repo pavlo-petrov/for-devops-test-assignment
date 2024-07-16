@@ -24,6 +24,9 @@ MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 echo "DB_NAME" 
 echo "$DB_NAME"
 echo "DB_NAME OK"
+echo "DB_HOST: $DB_HOST"
+echo "DB_USER: $DB_USER"
+
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
