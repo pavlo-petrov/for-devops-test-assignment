@@ -62,7 +62,7 @@ echo "DB_USER: $DB_USER"
 
 echo "create database" 
 
-DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "SHOW DATABASES LIKE ${DB_NAME};" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
     mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "CREATE DATABASE ${DB_NAME};"
 else
