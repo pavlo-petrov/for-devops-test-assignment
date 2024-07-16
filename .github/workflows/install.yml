@@ -225,9 +225,9 @@ jobs:
           aws autoscaling update-auto-scaling-group \
           --auto-scaling-group-name $ASG_NAME \
           --launch-template "LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version=$NEW_VERSION" \
-          --min-size 1 \
-          --max-size 2 \
-          --desired-capacity 1 \
+          --min-size 2 \
+          --max-size 4 \
+          --desired-capacity 2 \
           --termination-policies "OldestInstance"
 
       - name: Trigger Instance Refresh for Public ASG
