@@ -27,39 +27,51 @@ echo "DB_NAME OK"
 echo "DB_HOST: $DB_HOST"
 echo "DB_USER: $DB_USER"
 
-DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+
+cat << EOF > /tmp/my.cnf
+[client]
+user=${DB_USER}
+password=${DB_PASSWORD}
+host=${DB_HOST}
+EOF
+
+DB_EXISTS=$(mysql --defaults-extra-file=/tmp/my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+    mysql --defaults-extra-file=/tmp/my.cnf -e "CREATE DATABASE ${DB_NAME};"
 else
     echo "База даних ${DB_NAME} вже існує."
 fi
+
+rm -f /tmp/my.cnf
+echo "rm /tmp/my.cnf" 
+
 
 # Перевірка наявності необхідних змінних оточення
-if [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
-    echo "Помилка: Потрібно встановити змінні оточення DB_HOST, DB_USER, DB_PASSWORD, DB_NAME."
-    exit 1
-else 
-    echo "Змінні оточення встановлені коректно."
-    echo "DB_HOST: $DB_HOST"
-    echo "DB_USER: $DB_USER"
-    echo "DB_NAME: $DB_NAME"
-fi
+# if [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
+#     echo "Помилка: Потрібно встановити змінні оточення DB_HOST, DB_USER, DB_PASSWORD, DB_NAME."
+#     exit 1
+# else 
+#     echo "Змінні оточення встановлені коректно."
+#     echo "DB_HOST: $DB_HOST"
+#     echo "DB_USER: $DB_USER"
+#     echo "DB_NAME: $DB_NAME"
+# fi
 
-echo "create database" 
-DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
-echo "db_exists setted" 
+# echo "create database" 
+# DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
+# echo "db_exists setted" 
 
-if [ -z "$DB_EXISTS" ]; then
-    # Створення бази даних, якщо вона не існує
-    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
-    if [ $? -eq 0 ]; then
-        echo "База даних ${DB_NAME} успішно створена."
-    else
-        echo "Помилка: Не вдалося створити базу даних ${DB_NAME}."
-    fi
-else
-    echo "База даних ${DB_NAME} вже існує."
-fi
+# if [ -z "$DB_EXISTS" ]; then
+#     # Створення бази даних, якщо вона не існує
+#     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+#     if [ $? -eq 0 ]; then
+#         echo "База даних ${DB_NAME} успішно створена."
+#     else
+#         echo "Помилка: Не вдалося створити базу даних ${DB_NAME}."
+#     fi
+# else
+#     echo "База даних ${DB_NAME} вже існує."
+# fi
 
 echo "database created or not" 
 
