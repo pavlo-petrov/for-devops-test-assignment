@@ -27,7 +27,10 @@ MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 # else
 #     echo "База даних ${DB_NAME} вже існує."
 # fi
+
+echo "create database" 
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
+echo "db_exists setted" 
 
 if [ -z "$DB_EXISTS" ]; then
     # Створення бази даних, якщо вона не існує
@@ -41,7 +44,7 @@ else
     echo "База даних ${DB_NAME} вже існує."
 fi
 
-
+echo "database created or not" 
 
 
 USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
