@@ -21,13 +21,28 @@ MY_REGION=$AWS_RIGION
 MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
 # Створення бази даних та користувача MySQL
+# DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+# if [ -z "$DB_EXISTS" ]; then
+#     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+# else
+#     echo "База даних ${DB_NAME} вже існує."
+# fi
+DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 
-DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
+    # Створення бази даних, якщо вона не існує
     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+    if [ $? -eq 0 ]; then
+        echo "База даних ${DB_NAME} успішно створена."
+    else
+        echo "Помилка: Не вдалося створити базу даних ${DB_NAME}."
+    fi
 else
     echo "База даних ${DB_NAME} вже існує."
 fi
+
+
+
 
 USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
 if [ -z "$USER_EXISTS" ]; then
