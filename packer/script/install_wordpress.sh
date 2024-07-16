@@ -135,7 +135,7 @@ sed -i "s/cache.amazonaws.com/${REDIS_ENDPOINT}/" /var/www/html/wp-config.php
 echo "!!!!!!copied add setuped!!!!!!"
 
 # Перевірка з'єднання з базою даних
-php -r "
+sudo -u www-data php -r "
 \$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_PASSWORD}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);
