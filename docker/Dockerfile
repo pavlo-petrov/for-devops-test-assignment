@@ -45,4 +45,4 @@ RUN apt install -y sudo
 EXPOSE 80
 
 # Запуск Apache у foreground режимі
-CMD ["apachectl", "-D", "FOREGROUND"]
+CMD ["apache2ctl", "-D", "FOREGROUND"]
