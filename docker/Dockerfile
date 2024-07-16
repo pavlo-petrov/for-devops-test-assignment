@@ -4,7 +4,7 @@
 # FROM wordpress:latest
 FROM ubuntu:latest
 
-RUN apt update 
+RUN apt update && apt upgrade -y
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-zip
 RUN apt install -y php-intl 
