@@ -77,7 +77,8 @@ jobs:
           echo "admin_subnet_ids=$(terraform output -raw admin_subnet_ids_for_packer)" >> $GITHUB_ENV
           echo "security_group_for_parcker=$(terraform output -raw secutity_group_packer_id)" >> $GITHUB_ENV
           echo "iam_profile_for_s3=$(terraform output -raw iam_profile_for_s3)" >> $GITHUB_ENV
-          echo "AWS_S3_WORDPRESS_NAME_S3=$(terraform output -raw AWS_S3_WORDPRESS_NAME_S3)" >> $GITHUB_ENV
+          echo "user1=$(terraform output -raw user1)" >> $GITHUB_ENV
+          echo "mysql_database_name=$(terraform output -raw mysql_database_name)" >> $GITHUB_ENV
       
       - name: Retrieve Docker Hub credentials from AWS Secrets Manager
         run: |
@@ -120,6 +121,8 @@ jobs:
               -var "AMI_CURRUNT_NAME"=${{ env.AMI_CURRUNT_NAME }} \
               -var "iam_profile_for_s3"=${{ env.iam_profile_for_s3 }} \
               -var "AWS_S3_WORDPRESS_NAME_S3"=${{ env.AWS_S3_WORDPRESS_NAME_S3 }} \
+              -var "mysql_database_name"=${{ env.mysql_database_name }} \
+              -var "user1"=${{ env.user1 }} \
               ${{ env.packer-file }}
 
 ###################### deploy ###################              

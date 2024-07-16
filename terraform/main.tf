@@ -631,3 +631,4 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 #   # Інші налаштування EC2 інстансу
 #   subnet_id = "subnet-abcdef1234567890"
 # }
+############################ create DataBase and user #######################

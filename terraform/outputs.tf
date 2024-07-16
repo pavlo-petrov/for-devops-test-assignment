@@ -102,3 +102,15 @@ output "iam_profile_for_s3" {
 output "AWS_S3_WORDPRESS_NAME_S3" {
   value = var.s3_bucket_for_wordpress_name
 }
+
+output "mysql_database_name" {
+  value = var.db_name  
+}
+
+output "user1" {
+  value = var.user_paul
+}
+
+output "user2" {
+  value = var.user_mark
+}

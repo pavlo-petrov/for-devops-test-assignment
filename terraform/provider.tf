@@ -5,5 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0.0"
     }
+    mysql = {
+      source  = "terraform-providers/mysql"
+      version = "~> 1.9"
+    }
   }
 }
+
