@@ -21,12 +21,12 @@ MY_REGION=$AWS_RIGION
 MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
 # Створення бази даних та користувача MySQL
-# DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
-# if [ -z "$DB_EXISTS" ]; then
-#     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
-# else
-#     echo "База даних ${DB_NAME} вже існує."
-# fi
+DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+if [ -z "$DB_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+else
+    echo "База даних ${DB_NAME} вже існує."
+fi
 
 # Перевірка наявності необхідних змінних оточення
 if [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
