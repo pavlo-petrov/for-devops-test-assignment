@@ -13,10 +13,10 @@ RUN echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSI
 # RUN pecl install redis && docker-php-ext-enable redis
 # Копіюємо файли конфігурації Apache
 COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf
-RUN sudo systemctl enable apache2
-RUN sudo systemctl start apache2
-RUN sudo a2ensite wordpress-for-test.pp.ua.conf
-RUN sudo systemctl restart apache2
+RUN systemctl enable apache2
+RUN systemctl start apache2
+RUN a2ensite wordpress-for-test.pp.ua.conf
+RUN systemctl restart apache2
 
 # Робочий каталог для WordPress
 WORKDIR /var/www/html/
