@@ -14,9 +14,7 @@ RUN echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSI
 # Копіюємо файли конфігурації Apache
 COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf
 RUN ln -s /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf /etc/apache2/sites-enabled/wordpress-for-test.pp.ua.conf
-RUN service apache2 start
 RUN a2ensite wordpress-for-test.pp.ua.conf
-RUN service restart apache2
 
 # Робочий каталог для WordPress
 WORKDIR /var/www/html/
