@@ -35,6 +35,9 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN echo "mysql install started" 
 RUN apt install -y mysql-client
 RUN echo "mysql install finished"
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x /var/www/html/wp-cli.phar
+RUN mv /var/www/html/wp-cli.phar /usr/local/bin/wp
      
 
 

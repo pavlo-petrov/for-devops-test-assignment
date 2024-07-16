@@ -135,13 +135,10 @@ sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 sed -i "s/cache.amazonaws.com/${REDIS_ENDPOINT}/" /var/www/html/wp-config.php
 
 echo "!!!!!!copied add setuped!!!!!!"
-whoami
-sudo whoami
-sudo -u www-data whoami
 
 
 # Перевірка з'єднання з базою даних
-sudo -u www-data php -r "
+php -r "
 \$mysqli = new mysqli('${DB_HOST}', '${WP_ADMIN_USER}', '${WP_ADMIN_PASSWORD}', '${DB_NAME}');
 if (\$mysqli->connect_error) {
     die('Connection failed: ' . \$mysqli->connect_error);
@@ -163,15 +160,15 @@ echo "!!!!!!!!connection with db exist or not!!!!!!"
 echo "!!!!!! apache restarted correct !!!!!!"
 
 # Автоматичне встановлення WordPress через WP-CLI
-cd /var/www/html/
-echo "!!!!!! cd complite !!!!!!"
-sudo pws
-sudo wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-echo "!!!!!! wget complite !!!!!!"
-sudo chmod +x /var/www/html/wp-cli.phar
-echo "!!!!!! chmod complite !!!!!!"
-sudo mv /var/www/html/wp-cli.phar /usr/local/bin/wp
-echo "!!!!!! move complite !!!!!!"
+# cd /var/www/html/
+# echo "!!!!!! cd complite !!!!!!"
+# pwd
+# sudo wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+# echo "!!!!!! wget complite !!!!!!"
+# sudo chmod +x /var/www/html/wp-cli.phar
+# echo "!!!!!! chmod complite !!!!!!"
+# sudo mv /var/www/html/wp-cli.phar /usr/local/bin/wp
+# echo "!!!!!! move complite !!!!!!"
 
 
 echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
