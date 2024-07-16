@@ -1,3 +1,4 @@
+########################## main ##########################
 provider "aws" {
   region = var.aws_region
 }
@@ -10,6 +11,7 @@ terraform {
   }
 }
 
+########################## VPC and SubNets ##########################
 resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidr_block
   instance_tenancy = "default"
@@ -84,7 +86,7 @@ resource "aws_route_table_association" "admin_subnet_association" {
 }
 
 
-############## MySQL #################
+##########################  RDS MySQL and Elastic cashe REDIS ##########################
 
 # DB Subnet Group
 resource "aws_db_subnet_group" "default_db" {
@@ -182,7 +184,7 @@ data "aws_secretsmanager_secret_version" "example" {
   secret_id = data.aws_secretsmanager_secret.example.id
 }
 
-##################### Redis ################
+########################## Elastic Cashe Redis ##########################
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
   name       = "redis-subnet-group"
@@ -211,7 +213,7 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   #}
 }
 
-##################### security group for parcker #################
+########################## security group for packer ##########################
 resource "aws_security_group" "packer_security_group" {
   name        = "packer_security_group"
   description = "Security group for packer deployment"
@@ -233,7 +235,7 @@ resource "aws_security_group" "packer_security_group" {
   }
 }
 
-##################### ELB + ASG ##################
+########################## ELB + ASG ##########################
 
 resource "aws_security_group" "alb_sg" {
   vpc_id = aws_vpc.main.id
@@ -484,7 +486,6 @@ resource "aws_launch_template" "wordpress_admin" {
       Name = "wordpress-admin"
     }
   }
-
 }
 
 resource "aws_launch_template" "wordpress_public" {

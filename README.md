@@ -1,15 +1,19 @@
+
 # Install WordPress
 
 Site: 
 https://wordpress-for-test.pp.ua
-or 
-http://wordpress-for-test.pp.ua
+
 
 ## Schema of Installation
 
 ![AWS SCHEMA](schema.drawio.png)
 
 ---
+## Description
+For automation deploy you need: 
+- manual create all steps in "part #1" 
+- setup variables in /terraform/variables.tf 
 
 ## Part #1: Manual Setup
 
@@ -32,24 +36,27 @@ http://wordpress-for-test.pp.ua
 - Generate an SSH key for your EC2 instance.
 - (Note: It’s recommended to use Terraform for this, but you can skip regeneration if you already have a key.)
 
+- By the whay: you will need this key for create DB on RDS-MySQL server... 
+
 ---
 
 ## Part #2: Terraform
 
 1. Run the following commands:
    ```bash
+   cd terraform
    terraform init
    terraform apply
 
 
-
 ## Part #3: CI/CD
+![AWS SCHEMA](Screen_of_github_action.png)
 
 ### Step 3.1: Create Docker Container
 - **Objective**: Build a Docker container with the WordPress source code.
 - **Action**:
   - Push the Docker container to Docker Hub.
-- **Benefits**:
+- **Benefits of using container**:
   - Isolation of the site.
   - Facilitates future migrations.
 
