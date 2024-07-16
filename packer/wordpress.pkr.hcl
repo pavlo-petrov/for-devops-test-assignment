@@ -58,6 +58,14 @@ variable "AWS_S3_WORDPRESS_NAME_S3" {
   type = string
 }
 
+variable "mysql_database_name" {
+  type = string
+}
+
+variable "user1" {
+  type = string
+}
+
 
 packer {
   required_plugins {
@@ -131,6 +139,7 @@ sudo docker exec \
 -e REDIS_ENDPOINT=$REDIS_ENDPOINT \
 -e AWS_S3_WORDPRESS_NAME_S3 \
 -e AWS_REGION \
+-e MYSQL_DATABASE_NAME \
 my-container /bin/bash -c '
 /var/www/html/install_wordpress.sh
 '
@@ -148,12 +157,13 @@ HEREDOC
       "DB_NAME=wordpress_db",
       "WP_URL=wordpress-for-test.pp.ua",
       "WP_TITLE=This_is_name_of_Web_site",
-      "WP_ADMIN_USER=admin",
+      "WP_ADMIN_USER=${var.user1}",
       "WP_ADMIN_PASSWORD=${var.wordpress_db_passwd}",
       "WP_ADMIN_EMAIL=admin@wordpress-for-test.pp.ua",
       "AWS_S3_WORDPRESS_NAME_S3=${var.AWS_S3_WORDPRESS_NAME_S3}",
       "AWS_REGION=${var.aws_region}",
-      "REDIS_ENDPOINT=${var.redis_endpoint}"
+      "REDIS_ENDPOINT=${var.redis_endpoint}",
+      "MYSQL_DATABASE_NAME=${mysql_database_name}"
   ]
 }
 }
