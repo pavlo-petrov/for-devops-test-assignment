@@ -7,19 +7,20 @@ DB_PASSWORD=$DB_PASSWORD
 DB_HOST=$DB_HOST
 
 # Параметри WordPress
-WP_URL="http://wordpress-for-test.pp.ua"
+WP_URL="https://wordpress-for-test.pp.ua"
 WP_TITLE="My WordPress Site"
 WP_ADMIN_USER="paul"
 WP_ADMIN_PASSWORD=$DB_PASSWORD
 WP_ADMIN_EMAIL="admin@wordpress-for-test.pp.ua"
+
+# Redis access point
+REDIS_ENDPOINT=$REDIS_ENDPOINT
 
 # Параметри для S3
 MY_REGION=$AWS_RIGION
 MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
 # Створення бази даних та користувача MySQL
-echo "DB_HOST: $DB_HOST"
-echo "DB_PASSWORD: $DB_PASSWORD"
 
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
@@ -46,9 +47,7 @@ sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
 sed -i "s/username_here/${WP_ADMIN_USER}/" /var/www/html/wp-config.php
 sed -i "s/password_here/${WP_ADMIN_PASSWORD}/" /var/www/html/wp-config.php
 sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
-echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
-echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
-echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
+sed -i "s/cache.amazonaws.com/${REDIS_ENDPOINT}/" /var/www/html/wp-config.php
 
 echo "!!!!!!copied add setuped!!!!!!"
 
@@ -67,7 +66,7 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
 }
 "
 
-echo "!!!!!!!!connection with db exist!!!!!!"
+echo "!!!!!!!!connection with db exist or not!!!!!!"
 
 # Налаштування Apache
 a2enmod rewrite
@@ -88,12 +87,10 @@ sudo -u www-data wp plugin install redis-cache --activate
 WP_CONFIG_PATH="/var/www/html/wp-config.php"
 
 # install redis 
-#echo "define('WP_REDIS_HOST', '$REDIS_ENDPOINT');" >> "$WP_CONFIG_PATH"
-#echo "define('WP_REDIS_PORT', 6379);" >> "$WP_CONFIG_PATH"
-#echo "define('WP_CACHE', true);" >> "$WP_CONFIG_PATH"
-sudo -u www-data wp config set WP_REDIS_DATABASE "15"
-sudo -u www-data wp redis enable
-sudo -u www-data wp redis status
+sudo -u www-data wp config set WP_REDIS_DATABASE "0"
+sudo -u www-data wp redis enable --path=/var/www/html/
+sudo -u www-data wp redis status --path=/var/www/html/
+sudo -u www-data wp redis update-dropin --path=/var/www/html/
 
 echo "WordPress install or not - but we are in this step!"
 

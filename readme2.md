@@ -283,3 +283,211 @@ fi
         }
     ]
 }
+
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Зупинити скрипт при виникненні помилки
+set -e
+
+# Оновити систему
+sudo apt update
+sudo apt upgrade -y
+
+# Встановити необхідні пакети
+sudo apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip wget unzip
+
+sudo apt install -y php-pear php-dev
+
+# Встановити Redis через PECL, автоматично відповідаючи на запитання
+(echo "no" | sudo pecl install redis) || true
+echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')/apache2/conf.d/20-redis.ini
+
+# Перезапустити Apache для завантаження нового розширення
+sudo systemctl restart apache2
+
+# Завантажити та розпакувати WordPress
+wget https://wordpress.org/latest.zip
+unzip latest.zip
+sudo mv wordpress/* /var/www/html/
+
+# Налаштувати права доступу
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
+
+# Створити файл конфігурації wp-config.php
+cd /var/www/html/
+cp wp-config-sample.php wp-config.php
+
+# Заповнити файл конфігурації wp-config.php
+DB_NAME="wordpress"
+DB_USER="admin"
+DB_PASSWORD="ASDcsxcfsdfSDFSDF123123asdsadasd"
+DB_HOST="my-mysql-db.czc486e46x94.eu-west-1.rds.amazonaws.com"
+REDIS_HOST="my-redis-cluster.i1svca.0001.euw1.cache.amazonaws.com"
+
+sudo sed -i "s/database_name_here/$DB_NAME/" wp-config.php
+sudo sed -i "s/username_here/$DB_USER/" wp-config.php
+sudo sed -i "s/password_here/$DB_PASSWORD/" wp-config.php
+sudo sed -i "s/localhost/$DB_HOST/" wp-config.php
+
+# Додати налаштування Redis до wp-config.php
+sudo tee -a wp-config.php <<EOL
+
+# Redis configuration
+define('WP_REDIS_HOST', '$REDIS_HOST');
+define('WP_CACHE', true);
+define('WP_CACHE_KEY_SALT', 'your_unique_key_salt');
+EOL
+
+# Встановити плагін для Redis
+wget https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip
+unzip redis-cache.latest-stable.zip -d /var/www/html/wp-content/plugins/
+
+# Створити конфігураційний файл для Apache
+APACHE_CONF="/etc/apache2/sites-available/wordpress-for-test.pp.ua.conf"
+
+sudo tee $APACHE_CONF <<EOL
+<VirtualHost *:80>
+    ServerName wordpress-for-test.pp.ua
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+    # Перенаправлення HTTP на HTTPS
+    RewriteEngine on
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^/?(.*) https://%{SERVER_NAME}/\$1 [R,L]
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName wordpress-for-test.pp.ua
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/wordpress-for-test.pp.ua/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/wordpress-for-test.pp.ua/privkey.pem
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOL
+
+# Включити конфігураційний файл та перезавантажити Apache
+sudo a2ensite wordpress-for-test.pp.ua.conf
+sudo a2enmod rewrite ssl
+sudo systemctl restart apache2
+
+# Очищення
+rm latest.zip
+rm redis-cache.latest-stable.zip
+
+echo "WordPress installation and Apache configuration are complete."
+
+
+-----------
+
+
+
+#!/bin/bash
+
+# Зупинити скрипт при виникненні помилки
+set -e
+
+# Оновити систему
+sudo apt update
+
+
+# Встановити необхідні пакети
+sudo apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip wget unzip mysql-client php-pear php-dev
+
+# Встановити Redis через PECL, автоматично відповідаючи на запитання
+sudo pecl install redis
+echo "extension=redis.so" >> sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')/apache2/conf.d/20-redis.ini
+
+# Перезапустити Apache для завантаження нового розширення
+sudo systemctl restart apache2
+
+# Завантажити та розпакувати WordPress
+wget https://wordpress.org/latest.zip
+unzip latest.zip
+sudo cp -r wordpress/* /var/www/html/
+
+# Налаштувати права доступу
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
+
+# Створити файл конфігурації wp-config.php
+sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+
+# Заповнити файл конфігурації wp-config.php
+DB_NAME="wordpress"
+DB_USER="admin"
+DB_PASSWORD="ASDcsxcfsdfSDFSDF123123asdsadasd"
+DB_HOST="my-mysql-db.czc486e46x94.eu-west-1.rds.amazonaws.com"
+REDIS_HOST="my-redis-cluster.i1svca.0001.euw1.cache.amazonaws.com"
+
+sudo sed -i "s/database_name_here/$DB_NAME/" wp-config.php
+sudo sed -i "s/username_here/$DB_USER/" /var/www/html/wp-config.php
+sudo sed -i "s/password_here/$DB_PASSWORD/" wp-config.php
+sudo sed -i "s/localhost/$DB_HOST/" wp-config.php
+sudo sed -i "s/define('WP_REDIS_HOST', 'URL_OF_REDIS');/define('WP_REDIS_HOST', 'your_new_host');/" wp-config.php
+
+<!-- # Додати налаштування Redis до wp-config.php
+sudo tee -a wp-config.php <<EOL
+
+# Redis configuration
+define('WP_REDIS_HOST', '$REDIS_HOST');
+define('WP_CACHE', true);
+define('WP_CACHE_KEY_SALT', 'your_unique_key_salt');
+EOL -->
+
+# Встановити плагін для Redis
+wget https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip
+unzip redis-cache.latest-stable.zip -d /var/www/html/wp-content/plugins/
+
+# Створити конфігураційний файл для Apache
+APACHE_CONF="/etc/apache2/sites-available/wordpress-for-test.pp.ua.conf"
+
+sudo tee $APACHE_CONF <<EOL
+<VirtualHost *:80>
+    ServerName wordpress-for-test.pp.ua
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+
+EOL
+
+# Включити конфігураційний файл та перезавантажити Apache
+sudo a2ensite wordpress-for-test.pp.ua.conf
+sudo systemctl restart apache2
+
+# Очищення
+
+echo "WordPress installation and Apache configuration are complete."
