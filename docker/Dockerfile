@@ -1,7 +1,8 @@
 # Використовуємо офіційний образ PHP з Apache
 # #FROM php:7.4-apache
 # FROM php:8.2-cli
-FROM wordpress:latest
+# FROM wordpress:latest
+FROM ubuntu:latest
 
 RUN apt update 
 RUN apt install -y apache2 php php-mysql php-redis php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip wget unzip mysql-client php-pear php-dev
