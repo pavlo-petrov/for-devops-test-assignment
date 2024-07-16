@@ -21,6 +21,9 @@ MY_REGION=$AWS_RIGION
 MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
 # Створення бази даних та користувача MySQL
+echo "DB_NAME" 
+echo "$DB_NAME"
+echo "DB_NAME OK"
 DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
 if [ -z "$DB_EXISTS" ]; then
     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
