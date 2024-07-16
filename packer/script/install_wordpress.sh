@@ -165,7 +165,8 @@ echo "!!!!!! apache restarted correct !!!!!!"
 # Автоматичне встановлення WordPress через WP-CLI
 cd /var/www/html/
 echo "!!!!!! cd complite !!!!!!"
-wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+sudo pws
+sudo wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 echo "!!!!!! wget complite !!!!!!"
 sudo chmod +x /var/www/html/wp-cli.phar
 echo "!!!!!! chmod complite !!!!!!"
