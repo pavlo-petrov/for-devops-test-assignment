@@ -113,8 +113,6 @@ provisioner "shell" {
     "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
     "sudo DEBIAN_FRONTEND=noninteractive apt update -y",
     "sudo DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
-    "sudo apt update -y",
-    "sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
     "sudo usermod -aG docker $USER",
     "newgrp docker",
     "sudo systemctl start docker",

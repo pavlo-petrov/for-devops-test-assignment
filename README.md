@@ -9,6 +9,13 @@ https://wordpress-for-test.pp.ua
 
 ![AWS SCHEMA](schema.drawio.png)
 
+
+Not implemented:
+
+    Use of S3 for large objects;
+    CDN;
+    Real-life testing
+
 ---
 ## Description
 For automation deploy you need: 
@@ -48,6 +55,14 @@ For automation deploy you need:
    terraform init
    terraform apply
 
+### after this moment you will created:
+- vpc..
+- subnets..
+- rds mysql 
+- elastice cache REDIS
+- bastion host for create database and users for wordpress.. )
+- other .... 
+P.S. don't forgot to setup variables  )) 
 
 ## Part #3: CI/CD
 ![AWS SCHEMA](Screen_of_github_action.png)

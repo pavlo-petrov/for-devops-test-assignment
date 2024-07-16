@@ -333,7 +333,7 @@ resource "aws_lb_listener" "https_admin" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.asg1.arn
+    target_group_arn = aws_lb_target_group.asg2.arn
   }
 }
 
@@ -534,9 +534,9 @@ resource "aws_autoscaling_group" "asg2" {
     id = aws_launch_template.wordpress_public.id
     version = "$Latest"
   } 
-  min_size             = 3
+  min_size             = 2
   max_size             = 4
-  desired_capacity     = 1
+  desired_capacity     = 2
   vpc_zone_identifier  = local.public_subnet_ids
 
   tag {
@@ -545,7 +545,7 @@ resource "aws_autoscaling_group" "asg2" {
     propagate_at_launch = true
   }
 
-  target_group_arns = [aws_lb_target_group.asg2.arn]
+  target_group_arns = [aws_lb_target_group.asg1.arn]
 
   health_check_type         = "EC2"
   health_check_grace_period = 300
