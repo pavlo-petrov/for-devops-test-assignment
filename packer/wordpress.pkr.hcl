@@ -163,7 +163,7 @@ HEREDOC
       "AWS_S3_WORDPRESS_NAME_S3=${var.AWS_S3_WORDPRESS_NAME_S3}",
       "AWS_REGION=${var.aws_region}",
       "REDIS_ENDPOINT=${var.redis_endpoint}",
-      "MYSQL_DATABASE_NAME=${mysql_database_name}"
+      "MYSQL_DATABASE_NAME=${var.mysql_database_name}"
   ]
 }
 }
