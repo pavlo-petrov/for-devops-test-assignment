@@ -61,7 +61,18 @@ echo "DB_USER: $DB_USER"
 # fi 
 
 echo "create database" 
-DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}"" -p"${DB_PASSWORD}"" -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
+
+DB_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SHOW DATABASES LIKE '${DB_NAME}';" | grep "${DB_NAME}")
+if [ -z "$DB_EXISTS" ]; then
+    mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE ${DB_NAME};"
+else
+    echo "База даних ${DB_NAME} вже існує."
+fi
+
+echo "create database" 
+echo "create database" 
+echo "create database" 
+DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
 echo "db_exists setted" 
 
 if [ -z "$DB_EXISTS" ]; then
