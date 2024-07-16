@@ -135,6 +135,10 @@ sed -i "s/localhost/${DB_HOST}/" /var/www/html/wp-config.php
 sed -i "s/cache.amazonaws.com/${REDIS_ENDPOINT}/" /var/www/html/wp-config.php
 
 echo "!!!!!!copied add setuped!!!!!!"
+whoami
+sudo whoami
+sudo -u www-data whoami
+
 
 # Перевірка з'єднання з базою даних
 sudo -u www-data php -r "
