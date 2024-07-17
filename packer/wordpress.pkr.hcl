@@ -103,8 +103,6 @@ build {
 
 provisioner "shell" {
   inline = [
-    "sudo apt clean",
-    "sudo rm -rf /var/lib/apt/lists/*",
     "sudo apt update",
     "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg",
     "sudo install -m 0755 -d /etc/apt/keyrings",

@@ -20,112 +20,8 @@ REDIS_ENDPOINT=$REDIS_ENDPOINT
 MY_REGION=$AWS_RIGION
 MY_S3=$AWS_S3_WORDPRESS_NAME_S3
 
-# # Створення бази даних та користувача MySQL
-# echo "DB_NAME" 
-# echo "$DB_NAME"
-# echo "DB_NAME OK"
-# echo "DB_HOST: $DB_HOST"
-# echo "DB_USER: $DB_USER"
-
-
-# cat << EOF > /var/www/html/my.cnf
-# [client]
-# user=${DB_USER}
-# password=${DB_PASSWORD}
-# host=${DB_HOST}
-# EOF
-
-# echo "EOF"
-
-# cat /var/www/html/my.cnf
-
-# DB_EXISTS=$(mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
-# echo "DB_EXISTS = $DB_EXISTS ${DB_EXISTS}"
-#  if [ -z "$DB_EXISTS" ]; then
-#      mysql --defaults-extra-file=/var/www/html/my.cnf -e "CREATE DATABASE '${DB_NAME}';"
-#  else
-#      echo "База даних ${DB_NAME} вже існує."
-#  fi
-
-
-
-
-# # # Перевірка наявності необхідних змінних оточення
-# # if [ -z "${DB_HOST}" ] || [ -z "${DB_USER}" ] || [ -z "${DB_PASSWORD}" ] || [ -z "$DB_NAME" ]; then 
-# #     echo "DB_HOST: $DB_HOST" \
-# #     echo "DB_USER: $DB_USER" \
-# #     echo "DB_NAME: $DB_NAME" 
-# #     echo "Помилка: Потрібно встановити змінні оточення DB_HOST, DB_USER, DB_PASSWORD, DB_NAME." \
-# #     exit 1 
-# # else  
-# #     echo "Змінні оточення встановлені коректно." \
-# #     echo "DB_HOST: $DB_HOST" \
-# #     echo "DB_USER: $DB_USER" \
-# #     echo "DB_NAME: $DB_NAME" 
-# # fi 
-
-# echo "create database" 
-
-# # DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "SHOW DATABASES LIKE ${DB_NAME};" | grep "${DB_NAME}")
-# # echo "create database2" 
-
-# # if [ -z "$DB_EXISTS" ]; then
-# #     mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "CREATE DATABASE ${DB_NAME};"
-# # else
-# #     echo "База даних ${DB_NAME} вже існує."
-# # fi
-
-# echo "create database" 
-# echo "create database" 
-# echo "create database" 
-# # DB_EXISTS=$(mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "SHOW DATABASES LIKE '${DB_NAME}';" 2>/dev/null | grep "${DB_NAME}")
-# # echo "db_exists setted" 
-
-# # if [ -z "$DB_EXISTS" ]; then
-# #      # Створення бази даних, якщо вона не існує
-# #      mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "CREATE DATABASE ${DB_NAME};"
-# #      if [ $? -eq 0 ]; then
-# #          echo "База даних ${DB_NAME} успішно створена."
-# #      else
-# #          echo "Помилка: Не вдалося створити базу даних ${DB_NAME}."
-# #      fi
-# #  else
-# #      echo "База даних "${DB_NAME}" вже існує."
-# #  fi
-
-# echo "database created or not" 
-
-
-# # USER_EXISTS=$(mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
-# # if [ -z "$USER_EXISTS" ]; then
-# #     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
-# #     mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
-# # else
-# #     echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
-# # fi
-
-# # mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} -e "FLUSH PRIVILEGES;"
-
-# # Перевірка чи існує користувач MySQL
-# USER_EXISTS=$(mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names --batch -e "SELECT 1 FROM mysql.user WHERE user = '${DB_USER}' AND host = '${DB_HOST}';" | grep "1")
-# if [ -z "${USER_EXISTS}" ]; then
-#     mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names --batch -e "CREATE USER '${WP_ADMIN_USER}'@'%' IDENTIFIED BY '${WP_ADMIN_PASSWORD}';"
-#     mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names --batch -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${WP_ADMIN_USER}'@'%';"
-# else
-#     echo "Користувач ${WP_ADMIN_USER}@${DB_HOST} вже існує."
-# fi
-
-# # Оновлення привілеїв MySQL
-# mysql --defaults-extra-file=/var/www/html/my.cnf --silent --skip-column-names --batch -e "FLUSH PRIVILEGES;"
-
-
-#  rm -f /var/www/html/my.cnf
-#  echo "rm /var/www/html/my.cnf" 
-
-# echo "!!!!!!user added or exist!!!!!!"
 
 # Створення файлу wp-config.php
-# sudo -u www-data cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 echo "!!!!!!setup started!!!!!!"
 
 sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
@@ -153,25 +49,6 @@ if (!\$mysqli->select_db('${DB_NAME}')) {
 "
 
 echo "!!!!!!!!connection with db exist or not!!!!!!"
-
-# Налаштування Apache
-#a2enmod rewrite
-#apachectl graceful
-echo "!!!!!! apache restarted correct !!!!!!"
-
-# Автоматичне встановлення WordPress через WP-CLI
-# cd /var/www/html/
-# echo "!!!!!! cd complite !!!!!!"
-# pwd
-# sudo wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-# echo "!!!!!! wget complite !!!!!!"
-# sudo chmod +x /var/www/html/wp-cli.phar
-# echo "!!!!!! chmod complite !!!!!!"
-# sudo mv /var/www/html/wp-cli.phar /usr/local/bin/wp
-# echo "!!!!!! move complite !!!!!!"
-
-
-echo "!!!!!!!!!!wp client is installed or not!!!!!!!"
 
 # Виконання установки WordPress
 sudo -u www-data wp core install --url="${WP_URL}" --title="${WP_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASSWORD}" --admin_email="${WP_ADMIN_EMAIL}" --path=/var/www/html

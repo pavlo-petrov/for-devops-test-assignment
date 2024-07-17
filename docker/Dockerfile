@@ -1,7 +1,4 @@
 # Використовуємо офіційний образ PHP з Apache
-# #FROM php:7.4-apache
-# FROM php:8.2-cli
-# FROM wordpress:latest
 FROM ubuntu:latest
 
 RUN apt update && apt upgrade -y
@@ -13,8 +10,6 @@ RUN apt install -y php-pear php-dev
 RUN (echo "no" | sudo pecl install redis) || true
 RUN echo "extension=redis.so" > sudo tee /etc/php/$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')/apache2/conf.d/20-redis.ini
 
-# install redis... 
-# RUN pecl install redis && docker-php-ext-enable redis
 # Копіюємо файли конфігурації Apache
 COPY /packer/script/wordpress-for-test.pp.ua.conf /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf
 RUN ln -s /etc/apache2/sites-available/wordpress-for-test.pp.ua.conf /etc/apache2/sites-enabled/wordpress-for-test.pp.ua.conf

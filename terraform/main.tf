@@ -300,14 +300,6 @@ resource "aws_lb" "admin_alb" {
   subnets            = local.admin_subnet_ids
 }
 
-# resource "aws_lb" "public_alb" {
-#   name               = "load-balancer-public"
-#   internal           = false
-#   load_balancer_type = "application"
-#   security_groups    = [aws_security_group.alb_sg.id]
-#   subnets            = local.public_subnet_ids
-# }
-
 resource "aws_lb_listener" "http_admin" {
   load_balancer_arn = aws_lb.admin_alb.arn
   port              = "80"
@@ -336,38 +328,6 @@ resource "aws_lb_listener" "https_admin" {
     target_group_arn = aws_lb_target_group.asg2.arn
   }
 }
-
-
-# resource "aws_lb_listener" "http_public" {
-#   load_balancer_arn = aws_lb.public_alb.arn
-#   port              = "80"
-#   protocol          = "HTTP"
-
-#   default_action {
-#     type = "redirect"
-
-#     redirect {
-#       port        = "443"
-#       protocol    = "HTTPS"
-#       status_code = "HTTP_301"
-#     }
-#   }
-# }
-
-# resource "aws_lb_listener" "https_public" {
-#   load_balancer_arn = aws_lb.public_alb.arn
-#   port              = "443"
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#   certificate_arn   = var.ssl_arn_path
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.asg2.arn
-#   }
-# }
-
-
 
 resource "aws_lb_target_group" "asg1" {
   name        = "asg1-tg"
@@ -421,7 +381,7 @@ resource "aws_lb_listener_rule" "wpadmin_rule" {
 
   condition {
     path_pattern {
-      values = ["/wp-admin/*"]
+      values = ["/wp-admin*"]
     }
   }
 }
@@ -447,23 +407,6 @@ resource "aws_lb_listener_rule" "default_rule" {
     }
   }
 }
-
-
-# resource "aws_lb_listener_rule" "default_rule" {
-#   listener_arn = aws_lb_listener.https_public.arn
-#   priority     = 200
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.asg2.arn
-#   }
-
-#   condition {
-#     host_header {
-#       values = [ var.hosted_zone_name ]
-#     }
-#   }
-# }
 
 resource "aws_launch_template" "wordpress_admin" {
   name          = "wordpress-launch-template-admin"
@@ -545,7 +488,7 @@ resource "aws_autoscaling_group" "asg2" {
     propagate_at_launch = true
   }
 
-  target_group_arns = [aws_lb_target_group.asg1.arn]
+  target_group_arns = [aws_lb_target_group.asg2.arn]
 
   health_check_type         = "EC2"
   health_check_grace_period = 300
@@ -643,14 +586,5 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
-# # Приклад EC2 інстансу з прив'язкою до IAM профілю
-# resource "aws_instance" "wordpress_instance" {
-#   ami           = "ami-12345678"
-#   instance_type = "t2.micro"
-
-#   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
-
-#   # Інші налаштування EC2 інстансу
-#   subnet_id = "subnet-abcdef1234567890"
-# }
 ############################ create DataBase and user #######################
+############ moved to file "mysql.tf"
