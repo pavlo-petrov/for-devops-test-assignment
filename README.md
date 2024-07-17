@@ -7,7 +7,7 @@ https://wordpress-for-test.pp.ua
 
 ## Schema of Installation
 
-![AWS SCHEMA](schema.drawio.png)
+![AWS SCHEMA](schema.drawio.svg)
 
 
 Not implemented:
