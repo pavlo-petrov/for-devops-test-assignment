@@ -5,7 +5,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "mybucketfortest-2024-07-04-test"
+    bucket         = "mybucketfortest-2024-08-08-test"
     key            = "wordpress/prod/terraform.tfstate"
     region         = "eu-west-1"
   }

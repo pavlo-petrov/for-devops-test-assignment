@@ -12,7 +12,7 @@ variable "vpc_cidr_block" {
 
 variable "aws_account_id" {
   type    = string
-  default = "975050270418"
+  default = "021891605432"
 }
 
 ############## subnets ###############
@@ -83,7 +83,7 @@ variable "secret_manager_secret_name" {
 
 variable "ssl_arn_path" {
   type = string
-  default = "arn:aws:acm:eu-west-1:975050270418:certificate/7de29d6d-24e7-4eaa-8a70-97984a30e238"
+  default = "arn:aws:acm:eu-west-1:021891605432:certificate/5251d51c-51c6-4622-bba3-1e868f20fd5d"
   
 }
 
